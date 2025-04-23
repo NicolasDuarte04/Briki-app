@@ -1,294 +1,270 @@
 import React, { useState } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ScrollView, SafeAreaView, Alert, Switch, Platform
+  SafeAreaView,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Platform,
+  Alert,
+  Switch
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-const Stack = createNativeStackNavigator();
+const cities = ['Bogotá', 'CDMX', 'NYC', 'Madrid'];
+
 export default function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="TripInfo" component={TripInfoScreen} />
-        <Stack.Screen name="Plans" component={PlansScreen} />
-        <Stack.Screen name="Checkout" component={CheckoutScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
-function LoginScreen({ navigation }) {
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.logo}>briki</Text>
-      <Text style={styles.subtitle}>Login to your account</Text>
+  const [screen, setScreen] = useState('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
 
-      <View style={styles.formGroup}>
-        <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#666" />
-        <TextInput style={styles.input} placeholder="Password" secureTextEntry placeholderTextColor="#666" />
-      </View>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TripInfo')}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
-  );
-}
-function TripInfoScreen({ navigation }) {
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
-  const [age, setAge] = useState('');
+  const [fromCity, setFromCity] = useState('');
+  const [toCity, setToCity] = useState('');
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [showStart, setShowStart] = useState(false);
   const [showEnd, setShowEnd] = useState(false);
+  const [age, setAge] = useState('');
+  const [compare, setCompare] = useState(false);
+  const [plans] = useState([
+    { name: 'AXA', price: 45, coverage: '$200,000', perks: ['Trip cancellation', 'Baggage', 'COVID-19'] },
+    { name: 'Turismo Seguro', price: 38, coverage: '$150,000', perks: ['Trip cancellation', 'Baggage'] },
+    { name: 'SecurViajes', price: 52, coverage: '$300,000', perks: ['Emergency return', 'Trip interruption'] },
+  ]);
 
-  const handleContinue = () => {
-    if (!from || !to || !age) {
-      Alert.alert("Please complete all fields.");
-      return;
-    }
-    navigation.navigate('Plans');
+  const goToTripInfo = () => {
+    if (!email || !password) return Alert.alert('Please fill out email and password');
+    setScreen('trip');
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Trip Info</Text>
-
-        <Text style={styles.label}>From:</Text>
-        <Picker style={styles.picker} selectedValue={from} onValueChange={setFrom}>
-          <Picker.Item label="Select city..." value="" />
-          <Picker.Item label="Bogotá" value="Bogotá" />
-          <Picker.Item label="CDMX" value="CDMX" />
-        </Picker>
-
-        <Text style={styles.label}>To:</Text>
-        <Picker style={styles.picker} selectedValue={to} onValueChange={setTo}>
-          <Picker.Item label="Select city..." value="" />
-          <Picker.Item label="NYC" value="NYC" />
-          <Picker.Item label="Madrid" value="Madrid" />
-        </Picker>
-
-        <TextInput style={styles.input} placeholder="Your age" keyboardType="numeric" value={age} onChangeText={setAge} />
-
-        <TouchableOpacity style={styles.input} onPress={() => setShowStart(true)}>
-          <Text>Start Date: {startDate.toDateString()}</Text>
-        </TouchableOpacity>
-        {showStart && (
-          <DateTimePicker value={startDate} mode="date" display="default"
-            onChange={(_, d) => { setShowStart(false); if (d) setStartDate(d); }}
-          />
-        )}
-
-        <TouchableOpacity style={styles.input} onPress={() => setShowEnd(true)}>
-          <Text>End Date: {endDate.toDateString()}</Text>
-        </TouchableOpacity>
-        {showEnd && (
-          <DateTimePicker value={endDate} mode="date" display="default"
-            onChange={(_, d) => { setShowEnd(false); if (d) setEndDate(d); }}
-          />
-        )}
-
-        <TouchableOpacity style={styles.button} onPress={handleContinue}>
-          <Text style={styles.buttonText}>See Plans</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-function PlansScreen({ navigation }) {
-  const [compare, setCompare] = useState(false);
-  const plans = [
-    {
-      company: 'AXA',
-      price: '$45',
-      coverage: '$200K',
-      features: ['Trip cancellation', 'COVID-19', 'Baggage loss'],
-    },
-    {
-      company: 'Turismo Seguro',
-      price: '$38',
-      coverage: '$150K',
-      features: ['Baggage', 'Medical'],
-    },
-    {
-      company: 'SecurViajes',
-      price: '$52',
-      coverage: '$300K',
-      features: ['Full coverage', 'Emergency return'],
+  const viewPlans = () => {
+    if (!fromCity || !toCity || !startDate || !endDate || !age) {
+      return Alert.alert('Please fill out all fields');
     }
-  ];
+    setScreen('plans');
+  };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Plans</Text>
+  const goToCheckout = () => {
+    setScreen('checkout');
+  };
 
-      <View style={styles.compareToggle}>
-        <Text>Compare Plans</Text>
+  const renderPlans = () => (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.header}>Recommended Plans</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
+        <Text style={{ marginRight: 10 }}>Compare Plans</Text>
         <Switch value={compare} onValueChange={setCompare} />
       </View>
-
-      <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
-        {compare ? (
-          <View style={styles.compareContainer}>
-            {plans.map((p, i) => (
-              <View key={i} style={styles.compareCard}>
-                <Text style={styles.planTitle}>{p.company}</Text>
-                <Text>{p.price}</Text>
-                <Text>{p.coverage}</Text>
-                {p.features.map((f, j) => (
-                  <Text key={j} style={styles.bullet}>• {f}</Text>
-                ))}
-              </View>
-            ))}
-          </View>
-        ) : (
-          plans.map((p, i) => (
-            <View key={i} style={styles.card}>
-              <Text style={styles.planTitle}>{p.company}</Text>
-              <Text>{p.price}</Text>
-              <Text>{p.coverage}</Text>
-              {p.features.map((f, j) => (
-                <Text key={j} style={styles.bullet}>• {f}</Text>
-              ))}
-              <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Checkout')}>
-                <Text style={styles.buttonText}>Select</Text>
-              </TouchableOpacity>
-            </View>
-          ))
-        )}
-      </ScrollView>
-    </SafeAreaView>
+      {plans.map((plan, idx) => (
+        <View key={idx} style={[styles.card, compare && styles.cardCompare]}>
+          <Text style={styles.planName}>{plan.name}</Text>
+          <Text style={styles.price}>${plan.price}</Text>
+          <Text>Coverage: {plan.coverage}</Text>
+          {plan.perks.map((perk, i) => <Text key={i}>• {perk}</Text>)}
+          <TouchableOpacity style={styles.button} onPress={goToCheckout}>
+            <Text style={styles.buttonText}>Select</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+    </ScrollView>
   );
-}
-function CheckoutScreen() {
-  return (
+
+  const renderTripInfo = () => (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Checkout</Text>
-      <Text>Stripe integration will go here.</Text>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Confirm & Pay</Text>
+      <Text style={styles.header}>Trip Info</Text>
+      <Text style={styles.label}>From:</Text>
+      <View style={styles.input}>
+        <Picker selectedValue={fromCity} onValueChange={setFromCity}>
+          <Picker.Item label="Select city..." value="" />
+          {cities.map((city, i) => <Picker.Item key={i} label={city} value={city} />)}
+        </Picker>
+      </View>
+      <Text style={styles.label}>To:</Text>
+      <View style={styles.input}>
+        <Picker selectedValue={toCity} onValueChange={setToCity}>
+          <Picker.Item label="Select city..." value="" />
+          {cities.map((city, i) => <Picker.Item key={i} label={city} value={city} />)}
+        </Picker>
+      </View>
+      <Text style={styles.label}>Start Date:</Text>
+      <TouchableOpacity onPress={() => setShowStart(true)} style={styles.input}>
+        <Text>{startDate.toDateString()}</Text>
+      </TouchableOpacity>
+      {showStart && (
+        <DateTimePicker
+          value={startDate}
+          mode="date"
+          display="default"
+          onChange={(e, selected) => {
+            setShowStart(false);
+            if (selected) setStartDate(selected);
+          }}
+        />
+      )}
+      <Text style={styles.label}>End Date:</Text>
+      <TouchableOpacity onPress={() => setShowEnd(true)} style={styles.input}>
+        <Text>{endDate.toDateString()}</Text>
+      </TouchableOpacity>
+      {showEnd && (
+        <DateTimePicker
+          value={endDate}
+          mode="date"
+          display="default"
+          onChange={(e, selected) => {
+            setShowEnd(false);
+            if (selected) setEndDate(selected);
+          }}
+        />
+      )}
+      <TextInput
+        placeholder="Your age"
+        placeholderTextColor="#666"
+        style={styles.input}
+        keyboardType="numeric"
+        value={age}
+        onChangeText={setAge}
+      />
+      <TouchableOpacity style={styles.button} onPress={viewPlans}>
+        <Text style={styles.buttonText}>See Plans</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
+
+  const renderLogin = () => (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.logo}>briki</Text>
+      <Text style={styles.subheading}>Login to your account</Text>
+      <TextInput
+        placeholder="Email"
+        style={styles.input}
+        placeholderTextColor="#666"
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        placeholder="Password"
+        style={styles.input}
+        placeholderTextColor="#666"
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+      />
+      <View style={styles.checkboxRow}>
+        <Text>Remember me</Text>
+      </View>
+      <TouchableOpacity style={styles.button} onPress={goToTripInfo}>
+        <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
+      <TouchableOpacity>
+        <Text style={styles.link}>Forgot password?</Text>
+      </TouchableOpacity>
+      <TouchableOpacity>
+        <Text style={styles.link}>Create new account</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
+  );
+
+  const renderCheckout = () => (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.header}>Checkout</Text>
+      <Text>Stripe integration will go here.</Text>
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>Confirm and Pay</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
+  );
+
+  if (screen === 'login') return renderLogin();
+  if (screen === 'trip') return renderTripInfo();
+  if (screen === 'plans') return renderPlans();
+  if (screen === 'checkout') return renderCheckout();
 }
+
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fffdf5',
+    flexGrow: 1,
+    padding: 20,
+    backgroundColor: '#fffbee',
     alignItems: 'center',
-    paddingTop: 20,
-    paddingBottom: 30,
-  },
-  scrollContent: {
-    alignItems: 'center',
-    paddingBottom: 40,
+    justifyContent: 'center',
   },
   logo: {
-    fontSize: 44,
+    fontSize: 40,
     fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#000',
+  },
+  subheading: {
+    fontSize: 18,
     marginBottom: 20,
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 30,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '600',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  label: {
-    marginTop: 10,
-    marginBottom: 4,
-    alignSelf: 'flex-start',
-    marginLeft: 15,
-    fontWeight: '500',
   },
   input: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#eee',
     padding: 12,
+    marginVertical: 6,
     borderRadius: 10,
-    marginBottom: 10,
     width: '90%',
-    maxWidth: 360,
-    alignSelf: 'center',
   },
-  picker: {
-    backgroundColor: '#f0f0f0',
-    borderRadius: 10,
-    marginBottom: 10,
-    width: '90%',
-    maxWidth: 360,
-    alignSelf: 'center',
+  label: {
+    alignSelf: 'flex-start',
+    marginTop: 10,
+    marginBottom: 2,
+    fontWeight: '600',
+  },
+  header: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginVertical: 20,
   },
   button: {
-    backgroundColor: '#007AFF',
-    padding: 14,
+    backgroundColor: '#007aff',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
     borderRadius: 10,
-    marginTop: 10,
-    alignItems: 'center',
+    marginTop: 20,
     width: '90%',
-    maxWidth: 360,
+    alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  link: {
+    marginTop: 10,
+    color: '#007aff',
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 10,
   },
   card: {
     backgroundColor: '#fff',
     padding: 16,
-    borderRadius: 10,
-    marginBottom: 20,
+    borderRadius: 12,
     width: '90%',
-    maxWidth: 360,
-    shadowColor: '#ccc',
-    shadowOffset: { width: 0, height: 1 },
+    marginBottom: 15,
+    elevation: 3,
+    shadowColor: '#aaa',
     shadowOpacity: 0.2,
-    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
   },
-  planTitle: {
+  cardCompare: {
+    borderWidth: 2,
+    borderColor: '#007aff',
+  },
+  planName: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#007AFF',
-    marginBottom: 5,
+    fontWeight: 'bold',
+    color: '#007aff',
   },
-  bullet: {
-    color: '#444',
-    marginBottom: 2,
-  },
-  compareToggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-  },
-  compareContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    gap: 10,
-    flexWrap: 'wrap',
-  },
-  compareCard: {
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 8,
-    width: 110,
-    alignItems: 'center',
-    marginBottom: 12,
-    elevation: 2,
-  },
-  formGroup: {
-    width: '90%',
-    maxWidth: 360,
-    alignSelf: 'center',
-    marginBottom: 20,
+  price: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginVertical: 4,
   },
 });
