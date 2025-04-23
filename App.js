@@ -1,120 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, SafeAreaView, Alert, Picker } from 'react-native';
+import {
+  View, Text, TextInput, TouchableOpacity, StyleSheet,
+  ScrollView, SafeAreaView, Alert, Switch, Platform
+} from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Picker } from '@react-native-picker/picker';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-const Stack = createStackNavigator();
-
-const LoginScreen = ({ navigation }) => {
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.logo}>briki</Text>
-      <Text style={styles.subtitle}>Login to your account</Text>
-
-      <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#333" />
-      <TextInput style={styles.input} placeholder="Password" secureTextEntry placeholderTextColor="#333" />
-      
-      <View style={styles.rememberContainer}>
-        <Text style={styles.rememberText}>☐ Remember me</Text>
-      </View>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TripInfo')}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity>
-        <Text style={styles.link}>Forgot password?</Text>
-      </TouchableOpacity>
-      <TouchableOpacity>
-        <Text style={styles.link}>Create new account</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.orText}>Or sign in with</Text>
-      <TouchableOpacity style={styles.socialButton}><Text style={styles.socialText}>Continue with Google</Text></TouchableOpacity>
-      <TouchableOpacity style={styles.socialButton}><Text style={styles.socialText}>Continue with Apple</Text></TouchableOpacity>
-    </SafeAreaView>
-  );
-};
-
-const TripInfoScreen = ({ navigation }) => {
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
-  const [startDate, setStartDate] = useState('Wed Apr 23 2025');
-  const [endDate, setEndDate] = useState('Wed Apr 23 2025');
-  const [age, setAge] = useState('');
-
-  const handleSubmit = () => {
-    if (!from || !to || !startDate || !endDate || !age) {
-      Alert.alert('Please complete all fields before proceeding.');
-      return;
-    }
-    navigation.navigate('Plans');
-  };
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Trip Info</Text>
-
-      <Text style={styles.label}>From:</Text>
-      <TextInput style={styles.input} placeholder="Enter country or city" placeholderTextColor="#333" value={from} onChangeText={setFrom} />
-
-      <Text style={styles.label}>To:</Text>
-      <TextInput style={styles.input} placeholder="Enter destination" placeholderTextColor="#333" value={to} onChangeText={setTo} />
-
-      <Text style={styles.label}>Start Date:</Text>
-      <TextInput style={styles.input} value={startDate} editable={false} />
-
-      <Text style={styles.label}>End Date:</Text>
-      <TextInput style={styles.input} value={endDate} editable={false} />
-
-      <TextInput style={styles.input} placeholder="Your age" placeholderTextColor="#333" keyboardType="numeric" value={age} onChangeText={setAge} />
-
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>See Plans</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
-  );
-};
-
-const PlansScreen = ({ navigation }) => {
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Recommended Plans</Text>
-      <ScrollView>
-        {[
-          { company: 'AXA', price: '$45', coverage: '$200,000', features: ['Trip cancellation', 'Baggage', 'COVID-19'] },
-          { company: 'Turismo Seguro', price: '$38', coverage: '$150,000', features: ['Trip cancellation', 'Baggage'] },
-          { company: 'SecurViajes', price: '$52', coverage: '$300,000', features: ['Emergency return', 'Trip interruption'] }
-        ].map((plan, idx) => (
-          <View key={idx} style={styles.planCard}>
-            <Text style={styles.planTitle}>{plan.company}</Text>
-            <Text style={styles.planPrice}>{plan.price}</Text>
-            <Text style={styles.planCoverage}>Coverage: {plan.coverage}</Text>
-            {plan.features.map((feature, fidx) => (
-              <Text key={fidx}>• {feature}</Text>
-            ))}
-            <TouchableOpacity style={styles.selectButton} onPress={() => navigation.navigate('Checkout')}>
-              <Text style={styles.buttonText}>Select</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </ScrollView>
-    </SafeAreaView>
-  );
-};
-
-const CheckoutScreen = () => {
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Checkout</Text>
-      <Text>Stripe integration will go here.</Text>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Confirm and Pay</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
-  );
-};
-
+const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
@@ -127,112 +21,274 @@ export default function App() {
     </NavigationContainer>
   );
 }
+function LoginScreen({ navigation }) {
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.logo}>briki</Text>
+      <Text style={styles.subtitle}>Login to your account</Text>
 
+      <View style={styles.formGroup}>
+        <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#666" />
+        <TextInput style={styles.input} placeholder="Password" secureTextEntry placeholderTextColor="#666" />
+      </View>
+
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TripInfo')}>
+        <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
+  );
+}
+function TripInfoScreen({ navigation }) {
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const [age, setAge] = useState('');
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [showStart, setShowStart] = useState(false);
+  const [showEnd, setShowEnd] = useState(false);
+
+  const handleContinue = () => {
+    if (!from || !to || !age) {
+      Alert.alert("Please complete all fields.");
+      return;
+    }
+    navigation.navigate('Plans');
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.title}>Trip Info</Text>
+
+        <Text style={styles.label}>From:</Text>
+        <Picker style={styles.picker} selectedValue={from} onValueChange={setFrom}>
+          <Picker.Item label="Select city..." value="" />
+          <Picker.Item label="Bogotá" value="Bogotá" />
+          <Picker.Item label="CDMX" value="CDMX" />
+        </Picker>
+
+        <Text style={styles.label}>To:</Text>
+        <Picker style={styles.picker} selectedValue={to} onValueChange={setTo}>
+          <Picker.Item label="Select city..." value="" />
+          <Picker.Item label="NYC" value="NYC" />
+          <Picker.Item label="Madrid" value="Madrid" />
+        </Picker>
+
+        <TextInput style={styles.input} placeholder="Your age" keyboardType="numeric" value={age} onChangeText={setAge} />
+
+        <TouchableOpacity style={styles.input} onPress={() => setShowStart(true)}>
+          <Text>Start Date: {startDate.toDateString()}</Text>
+        </TouchableOpacity>
+        {showStart && (
+          <DateTimePicker value={startDate} mode="date" display="default"
+            onChange={(_, d) => { setShowStart(false); if (d) setStartDate(d); }}
+          />
+        )}
+
+        <TouchableOpacity style={styles.input} onPress={() => setShowEnd(true)}>
+          <Text>End Date: {endDate.toDateString()}</Text>
+        </TouchableOpacity>
+        {showEnd && (
+          <DateTimePicker value={endDate} mode="date" display="default"
+            onChange={(_, d) => { setShowEnd(false); if (d) setEndDate(d); }}
+          />
+        )}
+
+        <TouchableOpacity style={styles.button} onPress={handleContinue}>
+          <Text style={styles.buttonText}>See Plans</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+function PlansScreen({ navigation }) {
+  const [compare, setCompare] = useState(false);
+  const plans = [
+    {
+      company: 'AXA',
+      price: '$45',
+      coverage: '$200K',
+      features: ['Trip cancellation', 'COVID-19', 'Baggage loss'],
+    },
+    {
+      company: 'Turismo Seguro',
+      price: '$38',
+      coverage: '$150K',
+      features: ['Baggage', 'Medical'],
+    },
+    {
+      company: 'SecurViajes',
+      price: '$52',
+      coverage: '$300K',
+      features: ['Full coverage', 'Emergency return'],
+    }
+  ];
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Plans</Text>
+
+      <View style={styles.compareToggle}>
+        <Text>Compare Plans</Text>
+        <Switch value={compare} onValueChange={setCompare} />
+      </View>
+
+      <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+        {compare ? (
+          <View style={styles.compareContainer}>
+            {plans.map((p, i) => (
+              <View key={i} style={styles.compareCard}>
+                <Text style={styles.planTitle}>{p.company}</Text>
+                <Text>{p.price}</Text>
+                <Text>{p.coverage}</Text>
+                {p.features.map((f, j) => (
+                  <Text key={j} style={styles.bullet}>• {f}</Text>
+                ))}
+              </View>
+            ))}
+          </View>
+        ) : (
+          plans.map((p, i) => (
+            <View key={i} style={styles.card}>
+              <Text style={styles.planTitle}>{p.company}</Text>
+              <Text>{p.price}</Text>
+              <Text>{p.coverage}</Text>
+              {p.features.map((f, j) => (
+                <Text key={j} style={styles.bullet}>• {f}</Text>
+              ))}
+              <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Checkout')}>
+                <Text style={styles.buttonText}>Select</Text>
+              </TouchableOpacity>
+            </View>
+          ))
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+function CheckoutScreen() {
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Checkout</Text>
+      <Text>Stripe integration will go here.</Text>
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>Confirm & Pay</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
+  );
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fffcef',
+    backgroundColor: '#fffdf5',
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingBottom: 30,
+  },
+  scrollContent: {
+    alignItems: 'center',
+    paddingBottom: 40,
   },
   logo: {
-    fontSize: 40,
+    fontSize: 44,
     fontWeight: 'bold',
-    alignSelf: 'center',
-    marginTop: 60,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   subtitle: {
-    fontSize: 18,
-    textAlign: 'center',
+    fontSize: 16,
     marginBottom: 30,
   },
+  title: {
+    fontSize: 24,
+    fontWeight: '600',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  label: {
+    marginTop: 10,
+    marginBottom: 4,
+    alignSelf: 'flex-start',
+    marginLeft: 15,
+    fontWeight: '500',
+  },
   input: {
-    backgroundColor: '#eee',
+    backgroundColor: '#f0f0f0',
     padding: 12,
-    marginBottom: 12,
-    borderRadius: 8,
-    fontSize: 16,
+    borderRadius: 10,
+    marginBottom: 10,
+    width: '90%',
+    maxWidth: 360,
+    alignSelf: 'center',
+  },
+  picker: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    marginBottom: 10,
+    width: '90%',
+    maxWidth: 360,
+    alignSelf: 'center',
   },
   button: {
-    backgroundColor: '#007aff',
-    padding: 15,
+    backgroundColor: '#007AFF',
+    padding: 14,
     borderRadius: 10,
-    alignItems: 'center',
     marginTop: 10,
-    marginBottom: 10,
+    alignItems: 'center',
+    width: '90%',
+    maxWidth: 360,
   },
   buttonText: {
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,
   },
-  link: {
-    color: '#007aff',
-    textAlign: 'center',
-    marginTop: 8,
-  },
-  socialButton: {
-    backgroundColor: '#000',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 10,
-  },
-  socialText: {
-    color: '#fff',
-    textAlign: 'center',
-  },
-  header: {
-    fontSize: 26,
-    fontWeight: '600',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  label: {
-    marginBottom: 4,
-    marginTop: 12,
-    fontWeight: '500',
-  },
-  rememberContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  rememberText: {
-    color: '#333',
-    marginLeft: 6,
-  },
-  orText: {
-    marginTop: 20,
-    textAlign: 'center',
-    color: '#333',
-  },
-  planCard: {
+  card: {
     backgroundColor: '#fff',
-    borderRadius: 10,
     padding: 16,
+    borderRadius: 10,
     marginBottom: 20,
-    elevation: 2,
+    width: '90%',
+    maxWidth: 360,
+    shadowColor: '#ccc',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
   },
   planTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#007aff',
-  },
-  planPrice: {
     fontSize: 18,
     fontWeight: '600',
-    marginTop: 4,
+    color: '#007AFF',
+    marginBottom: 5,
   },
-  planCoverage: {
-    fontSize: 14,
-    color: '#555',
-    marginBottom: 8,
+  bullet: {
+    color: '#444',
+    marginBottom: 2,
   },
-  selectButton: {
-    backgroundColor: '#007aff',
-    padding: 10,
-    borderRadius: 6,
+  compareToggle: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
-  }
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  compareContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    gap: 10,
+    flexWrap: 'wrap',
+  },
+  compareCard: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    width: 110,
+    alignItems: 'center',
+    marginBottom: 12,
+    elevation: 2,
+  },
+  formGroup: {
+    width: '90%',
+    maxWidth: 360,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
 });
