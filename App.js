@@ -1,182 +1,135 @@
 import React, { useState } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ScrollView, Alert, Platform
+  SafeAreaView,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Platform
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-picker/picker';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const Stack = createNativeStackNavigator();
 
-function LoginScreen({ navigation }) {
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [remember, setRemember] = useState(false);
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.logo}>briki</Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>briki</Text>
       <Text style={styles.subtitle}>Login to your account</Text>
-
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        style={styles.input}
-        autoCapitalize="none"
-      />
-
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
-
+      <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#555" value={email} onChangeText={setEmail} />
+      <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#555" value={password} onChangeText={setPassword} secureTextEntry />
       <View style={styles.checkboxRow}>
-        <TouchableOpacity onPress={() => setRemember(!remember)}>
-          <Text style={{ fontSize: 14 }}>
-            {remember ? '☑' : '☐'} Remember me
-          </Text>
-        </TouchableOpacity>
+        <Text>☐ Remember me</Text>
       </View>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Form')}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TripInfo')}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
-
       <Text style={styles.link}>Forgot password?</Text>
       <Text style={styles.link}>Create new account</Text>
-
-      <View style={{ marginTop: 20 }}>
-        <Text style={{ marginBottom: 8 }}>Or sign in with</Text>
-        <TouchableOpacity style={styles.socialButton}>
-          <Text style={styles.buttonText}>Continue with Google</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <Text style={styles.buttonText}>Continue with Apple</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+      <Text style={{ marginTop: 20 }}>Or sign in with</Text>
+      <TouchableOpacity style={styles.socialButton}>
+        <Text style={styles.socialText}>Continue with Google</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.socialButton}>
+        <Text style={styles.socialText}>Continue with Apple</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
-}
+};
 
-function FormScreen({ navigation }) {
-  const [origin, setOrigin] = useState('');
-  const [destination, setDestination] = useState('');
+const TripInfoScreen = ({ navigation }) => {
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [showStart, setShowStart] = useState(false);
-  const [showEnd, setShowEnd] = useState(false);
   const [age, setAge] = useState('');
-  const [optionalEmail, setOptionalEmail] = useState('');
+  const [email, setEmail] = useState('');
 
-  const validateAndContinue = () => {
-    if (!origin || !destination || !age || !startDate || !endDate) {
-      Alert.alert("Missing Information", "Please complete all fields before continuing.");
-    } else {
-      navigation.navigate('Plans', { optionalEmail });
+  const handleNext = () => {
+    if (!from || !to || !age) {
+      Alert.alert('Missing info', 'Please complete all required fields.');
+      return;
     }
+    navigation.navigate('Plans');
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Trip Info</Text>
-
-      <Text style={styles.label}>From:</Text>
-      <Picker selectedValue={origin} onValueChange={setOrigin} style={styles.picker}>
-        <Picker.Item label="Select country..." value="" />
-        <Picker.Item label="Bogotá" value="Bogotá" />
-        <Picker.Item label="CDMX" value="CDMX" />
-      </Picker>
-
-      <Text style={styles.label}>To:</Text>
-      <Picker selectedValue={destination} onValueChange={setDestination} style={styles.picker}>
-        <Picker.Item label="Select destination..." value="" />
-        <Picker.Item label="NYC" value="NYC" />
-        <Picker.Item label="Madrid" value="Madrid" />
-      </Picker>
-
-      <TouchableOpacity onPress={() => setShowStart(true)} style={styles.dateInput}>
-        <Text>Start Date: {startDate.toDateString()}</Text>
-      </TouchableOpacity>
-      {showStart && <DateTimePicker value={startDate} mode="date" onChange={(_, date) => { setShowStart(false); if (date) setStartDate(date); }} />}
-
-      <TouchableOpacity onPress={() => setShowEnd(true)} style={styles.dateInput}>
-        <Text>End Date: {endDate.toDateString()}</Text>
-      </TouchableOpacity>
-      {showEnd && <DateTimePicker value={endDate} mode="date" onChange={(_, date) => { setShowEnd(false); if (date) setEndDate(date); }} />}
-
-      <TextInput style={styles.input} placeholder="Your age" value={age} keyboardType="numeric" onChangeText={setAge} />
-      <TextInput style={styles.input} placeholder="Optional email for confirmation" value={optionalEmail} onChangeText={setOptionalEmail} />
-
-      <TouchableOpacity style={styles.button} onPress={validateAndContinue}>
-        <Text style={styles.buttonText}>See Plans</Text>
-      </TouchableOpacity>
-    </ScrollView>
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        <Text style={styles.subtitle}>Trip Info</Text>
+        <Text style={styles.label}>From:</Text>
+        <TextInput style={styles.input} placeholder="Enter country or city" value={from} onChangeText={setFrom} />
+        <Text style={styles.label}>To:</Text>
+        <TextInput style={styles.input} placeholder="Enter destination" value={to} onChangeText={setTo} />
+        <Text style={styles.label}>Start Date:</Text>
+        <DateTimePicker value={startDate} mode="date" display="default" onChange={(e, date) => date && setStartDate(date)} />
+        <Text style={styles.label}>End Date:</Text>
+        <DateTimePicker value={endDate} mode="date" display="default" onChange={(e, date) => date && setEndDate(date)} />
+        <TextInput style={styles.input} placeholder="Your age" keyboardType="numeric" value={age} onChangeText={setAge} />
+        <TextInput style={styles.input} placeholder="Optional email for confirmation" value={email} onChangeText={setEmail} />
+        <TouchableOpacity style={styles.button} onPress={handleNext}>
+          <Text style={styles.buttonText}>See Plans</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
-}
+};
 
-function PlansScreen({ route }) {
-  const [compare, setCompare] = useState(false);
-  const { optionalEmail } = route.params;
-
+const PlansScreen = ({ navigation }) => {
   const plans = [
-    { name: "AXA", price: "$45", coverage: "$200k", benefits: ["COVID-19", "Lost Luggage", "Flight Delay"] },
-    { name: "Turismo Seguro", price: "$39", coverage: "$150k", benefits: ["Trip Cancellation", "Medical", "Basic Baggage"] },
-    { name: "SecurViajes", price: "$52", coverage: "$300k", benefits: ["Full Coverage", "Emergency Return", "VIP Service"] },
+    { provider: 'AXA', price: 45, features: ['Trip cancellation', 'Baggage', 'COVID-19'] },
+    { provider: 'Turismo Seguro', price: 38, features: ['Trip cancellation', 'Baggage'] },
+    { provider: 'SecurViajes', price: 52, features: ['Emergency return', 'Trip interruption'] },
   ];
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Recommended Plans</Text>
-      <TouchableOpacity onPress={() => setCompare(!compare)}>
-        <Text style={styles.link}>{compare ? "Hide Comparison" : "Compare Plans"}</Text>
-      </TouchableOpacity>
-
-      {compare ? (
-        <View style={styles.compareBox}>
-          {plans.map((plan, i) => (
-            <View key={i} style={styles.compareCard}>
-              <Text style={styles.cardTitle}>{plan.name}</Text>
-              <Text>{plan.price}</Text>
-              <Text>{plan.coverage}</Text>
-              {plan.benefits.map((b, j) => (
-                <Text key={j} style={styles.bullet}>• {b}</Text>
-              ))}
-            </View>
-          ))}
-        </View>
-      ) : (
-        plans.map((plan, i) => (
-          <View key={i} style={styles.card}>
-            <Text style={styles.cardTitle}>{plan.name}</Text>
-            <Text>{plan.price}</Text>
-            <Text>{plan.coverage}</Text>
-            {plan.benefits.map((b, j) => (
-              <Text key={j} style={styles.bullet}>• {b}</Text>
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        <Text style={styles.subtitle}>Recommended Plans</Text>
+        {plans.map((plan, index) => (
+          <View key={index} style={styles.card}>
+            <Text style={styles.cardTitle}>{plan.provider}</Text>
+            <Text style={styles.cardPrice}>${plan.price}</Text>
+            {plan.features.map((feature, i) => (
+              <Text key={i}>• {feature}</Text>
             ))}
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Checkout')}>
               <Text style={styles.buttonText}>Select</Text>
             </TouchableOpacity>
           </View>
-        ))
-      )}
-    </ScrollView>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
-}
+};
+
+const CheckoutScreen = () => {
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.subtitle}>Checkout</Text>
+      <Text style={{ marginVertical: 10 }}>Stripe integration will go here.</Text>
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>Confirm and Pay</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
+  );
+};
 
 export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Form" component={FormScreen} />
+        <Stack.Screen name="TripInfo" component={TripInfoScreen} />
         <Stack.Screen name="Plans" component={PlansScreen} />
+        <Stack.Screen name="Checkout" component={CheckoutScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -184,109 +137,81 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 24,
-    flexGrow: 1,
-    backgroundColor: '#fffdf6',
-    alignItems: 'center',
-  },
-  logo: {
-    fontSize: 44,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 30,
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fffaf0',
   },
   title: {
-    fontSize: 22,
+    fontSize: 40,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 10,
+    alignSelf: 'center',
+  },
+  subtitle: {
+    fontSize: 22,
+    marginBottom: 20,
+    alignSelf: 'center',
   },
   input: {
-    backgroundColor: '#fff',
-    borderColor: '#ccc',
     borderWidth: 1,
-    width: '100%',
-    padding: 12,
-    marginBottom: 10,
-    borderRadius: 8,
-  },
-  dateInput: {
-    backgroundColor: '#fff',
-    padding: 12,
-    width: '100%',
-    borderRadius: 8,
-    marginBottom: 10,
     borderColor: '#ccc',
-    borderWidth: 1,
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 15,
+    backgroundColor: '#f0f0f0',
   },
-  picker: {
-    backgroundColor: '#fff',
-    width: '100%',
-    borderRadius: 8,
-    marginBottom: 10,
+  label: {
+    marginBottom: 5,
+    marginTop: 10,
+    fontWeight: '600',
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#007aff',
     padding: 14,
-    borderRadius: 8,
-    marginTop: 10,
-    width: '100%',
+    borderRadius: 10,
     alignItems: 'center',
+    marginTop: 15,
   },
   buttonText: {
     color: '#fff',
-    fontWeight: 'bold',
-  },
-  link: {
-    color: '#007AFF',
-    marginTop: 10,
-  },
-  checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  socialButton: {
-    backgroundColor: '#000',
-    padding: 12,
-    borderRadius: 6,
-    marginTop: 10,
-    alignItems: 'center',
+    fontWeight: '600',
   },
   card: {
     backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    width: '100%',
-    marginBottom: 20,
-    shadowColor: '#ddd',
-    shadowOpacity: 0.15,
+    padding: 15,
+    marginBottom: 15,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
     shadowRadius: 5,
-    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   cardTitle: {
+    fontWeight: 'bold',
     fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 6,
-    color: '#007AFF',
+    color: '#007aff',
   },
-  bullet: {
-    color: '#555',
-    fontSize: 14,
+  cardPrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
   },
-  compareBox: {
+  checkboxRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 10,
+    marginBottom: 10,
   },
-  compareCard: {
-    flex: 1,
+  link: {
+    color: '#007aff',
+    marginTop: 8,
+  },
+  socialButton: {
+    backgroundColor: '#000',
     padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    margin: 5,
+    borderRadius: 6,
+    marginTop: 10,
+  },
+  socialText: {
+    color: '#fff',
+    textAlign: 'center',
   },
 });
