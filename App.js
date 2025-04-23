@@ -7,41 +7,55 @@ import {
   StyleSheet,
   ScrollView,
   Image,
+  Platform,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator();
 
-// FAKE PLAN DATA
 const plans = [
   {
     company: 'AXA',
     price: '$45',
     coverage: '$200,000',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Logo_AXA.svg/1200px-Logo_AXA.svg.png',
     benefits: ['Trip cancellation', 'Baggage', 'COVID-19'],
   },
   {
     company: 'Turismo Seguro',
     price: '$38',
     coverage: '$150,000',
+    logo: 'https://via.placeholder.com/60x30.png?text=Turismo',
     benefits: ['Trip cancellation', 'Baggage'],
   },
   {
     company: 'SecurViajes',
     price: '$52',
     coverage: '$300,000',
-    benefits: ['Emergency return', 'Baggage loss', 'Trip interruption'],
+    logo: 'https://via.placeholder.com/60x30.png?text=SecurViajes',
+    benefits: ['Emergency return', 'Trip interruption'],
   },
 ];
 
-// SCREEN 1: Welcome
+function BrikiLogo() {
+  return (
+    <View style={styles.logoContainer}>
+      <Text style={styles.logoText}>br</Text>
+      <View style={{ alignItems: 'center' }}>
+        <Text style={styles.checkmark}>✓</Text>
+        <Text style={styles.logoText}>iki</Text>
+      </View>
+    </View>
+  );
+}
+
 function WelcomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>briki</Text>
-      <Text style={styles.checkmark}>✔︎</Text>
-      <Text style={styles.subtitle}>Travel Insurance in 2 Minutes</Text>
+      <BrikiLogo />
+      <Text style={styles.subtitle}>Insurance in 2 minutes</Text>
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Form')}>
         <Text style={styles.buttonText}>Get Started</Text>
       </TouchableOpacity>
@@ -49,22 +63,73 @@ function WelcomeScreen({ navigation }) {
   );
 }
 
-// SCREEN 2: Travel Form
 function FormScreen({ navigation }) {
   const [destination, setDestination] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
   const [age, setAge] = useState('');
   const [email, setEmail] = useState('');
 
   return (
     <ScrollView style={styles.scroll}>
       <Text style={styles.title}>Your Trip Info</Text>
-      <TextInput style={styles.input} placeholder="Fly from..." placeholderTextColor="#999" value={destination} onChangeText={setDestination} />
-      <TextInput style={styles.input} placeholder="Start date (YYYY-MM-DD)" placeholderTextColor="#999" value={startDate} onChangeText={setStartDate} />
-      <TextInput style={styles.input} placeholder="End date (YYYY-MM-DD)" placeholderTextColor="#999" value={endDate} onChangeText={setEndDate} />
-      <TextInput style={styles.input} placeholder="Your age" placeholderTextColor="#999" value={age} onChangeText={setAge} keyboardType="numeric" />
-      <TextInput style={styles.input} placeholder="Your email" placeholderTextColor="#999" value={email} onChangeText={setEmail} keyboardType="email-address" />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Fly from..."
+        placeholderTextColor="#999"
+        value={destination}
+        onChangeText={setDestination}
+      />
+
+      <TouchableOpacity onPress={() => setShowStartPicker(true)}>
+        <Text style={styles.inputLabel}>Start Date: {startDate.toDateString()}</Text>
+      </TouchableOpacity>
+      {showStartPicker && (
+        <DateTimePicker
+          value={startDate}
+          mode="date"
+          display="default"
+          onChange={(e, date) => {
+            setShowStartPicker(false);
+            if (date) setStartDate(date);
+          }}
+        />
+      )}
+
+      <TouchableOpacity onPress={() => setShowEndPicker(true)}>
+        <Text style={styles.inputLabel}>End Date: {endDate.toDateString()}</Text>
+      </TouchableOpacity>
+      {showEndPicker && (
+        <DateTimePicker
+          value={endDate}
+          mode="date"
+          display="default"
+          onChange={(e, date) => {
+            setShowEndPicker(false);
+            if (date) setEndDate(date);
+          }}
+        />
+      )}
+
+      <TextInput
+        style={styles.input}
+        placeholder="Your age"
+        placeholderTextColor="#999"
+        value={age}
+        onChangeText={setAge}
+        keyboardType="numeric"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Your email"
+        placeholderTextColor="#999"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+      />
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Plans')}>
         <Text style={styles.buttonText}>See Plans</Text>
       </TouchableOpacity>
@@ -72,14 +137,16 @@ function FormScreen({ navigation }) {
   );
 }
 
-// SCREEN 3: Plan List
 function PlanListScreen({ navigation }) {
   return (
     <ScrollView style={styles.scroll}>
       <Text style={styles.title}>Recommended Plans</Text>
-      {plans.map((plan, i) => (
-        <View key={i} style={styles.card}>
-          <Text style={styles.company}>{plan.company}</Text>
+      {plans.map((plan, index) => (
+        <View key={index} style={styles.card}>
+          <View style={styles.logoRow}>
+            <Image source={{ uri: plan.logo }} style={styles.logoImg} />
+            <Text style={styles.company}>{plan.company}</Text>
+          </View>
           <Text style={styles.price}>{plan.price}</Text>
           <Text style={styles.coverage}>Coverage: {plan.coverage}</Text>
           {plan.benefits.map((b, j) => (
@@ -94,18 +161,16 @@ function PlanListScreen({ navigation }) {
   );
 }
 
-// SCREEN 4: Checkout
 function CheckoutScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>You're all set!</Text>
-      <Text style={styles.subtitle}>Your insurance will be sent to your email.</Text>
+      <Text style={styles.subtitle}>Your policy will be sent to your email.</Text>
       <Text style={{ fontSize: 80, marginTop: 30 }}>✓</Text>
     </View>
   );
 }
 
-// APP ROOT
 export default function App() {
   return (
     <NavigationContainer>
@@ -119,7 +184,6 @@ export default function App() {
   );
 }
 
-// STYLES
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -133,17 +197,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff6eb',
     padding: 24,
   },
-  logo: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: '#007AFF',
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
     marginBottom: 5,
   },
-  checkmark: {
-    fontSize: 26,
-    color: '#007AFF',
+  logoText: {
+    fontSize: 46,
     fontWeight: 'bold',
-    marginBottom: 20,
+    color: '#000',
+    fontFamily: Platform.OS === 'ios' ? 'Helvetica Neue' : 'sans-serif',
+  },
+  checkmark: {
+    fontSize: 18,
+    color: '#007AFF',
+    marginBottom: -10,
   },
   subtitle: {
     fontSize: 18,
@@ -167,6 +236,16 @@ const styles = StyleSheet.create({
     color: '#000',
     borderWidth: 1,
     borderColor: '#ddd',
+  },
+  inputLabel: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 14,
+    marginBottom: 14,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    color: '#333',
   },
   button: {
     backgroundColor: '#007AFF',
@@ -203,6 +282,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     color: '#007AFF',
+    marginLeft: 10,
+  },
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoImg: {
+    width: 60,
+    height: 30,
+    resizeMode: 'contain',
   },
   price: {
     fontSize: 18,
