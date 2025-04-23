@@ -11,13 +11,56 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
 function LoginScreen({ navigation }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [remember, setRemember] = useState(false);
+
   return (
     <View style={styles.container}>
       <Text style={styles.logo}>briki</Text>
-      <Text style={styles.subtitle}>Travel Insurance. Instantly.</Text>
+      <Text style={styles.subtitle}>Login to your account</Text>
+
+      <TextInput
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        style={styles.input}
+        autoCapitalize="none"
+      />
+
+      <TextInput
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        style={styles.input}
+      />
+
+      <View style={styles.checkboxRow}>
+        <TouchableOpacity onPress={() => setRemember(!remember)}>
+          <Text style={{ fontSize: 14 }}>
+            {remember ? '☑' : '☐'} Remember me
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Form')}>
-        <Text style={styles.buttonText}>Continue</Text>
+        <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
+
+      <Text style={styles.link}>Forgot password?</Text>
+      <Text style={styles.link}>Create new account</Text>
+
+      <View style={{ marginTop: 20 }}>
+        <Text style={{ marginBottom: 8 }}>Or sign in with</Text>
+        <TouchableOpacity style={styles.socialButton}>
+          <Text style={styles.buttonText}>Continue with Google</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.socialButton}>
+          <Text style={styles.buttonText}>Continue with Apple</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -197,11 +240,21 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  label: {
-    alignSelf: 'flex-start',
-    marginBottom: 4,
+  link: {
+    color: '#007AFF',
     marginTop: 10,
-    color: '#555',
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  socialButton: {
+    backgroundColor: '#000',
+    padding: 12,
+    borderRadius: 6,
+    marginTop: 10,
+    alignItems: 'center',
   },
   card: {
     backgroundColor: '#fff',
@@ -235,9 +288,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     margin: 5,
-  },
-  link: {
-    color: '#007AFF',
-    marginBottom: 16,
   },
 });
