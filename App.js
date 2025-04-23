@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ScrollView, Image, Platform, CheckBox
+  ScrollView, Alert, Platform
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
@@ -10,38 +10,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator();
 
-// Placeholder logos (replace with actual paths if needed)
-const insuranceLogos = {
-  AXA: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Logo_AXA.svg/1200px-Logo_AXA.svg.png',
-  Turismo: 'https://via.placeholder.com/60x30.png?text=Turismo',
-  SecurViajes: 'https://via.placeholder.com/60x30.png?text=SecurViajes',
-};
-
 function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [remember, setRemember] = useState(false);
-
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>briki<Text style={styles.check}>✓</Text></Text>
-      <Text style={styles.subtitle}>Insurance in 2 minutes</Text>
-
-      <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
-      <TextInput style={styles.input} placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
-
-      <View style={styles.checkboxRow}>
-        <CheckBox value={remember} onValueChange={setRemember} />
-        <Text> Remember me</Text>
-      </View>
-
+      <Text style={styles.logo}>briki</Text>
+      <Text style={styles.subtitle}>Travel Insurance. Instantly.</Text>
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Form')}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>Continue</Text>
       </TouchableOpacity>
-
-      <Text style={styles.link}>Sign in with Google / Apple (placeholder)</Text>
-      <Text style={styles.link}>Forgot password?</Text>
-      <Text style={styles.link}>Create account</Text>
     </View>
   );
 }
@@ -51,142 +27,103 @@ function FormScreen({ navigation }) {
   const [destination, setDestination] = useState('');
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
+  const [showStart, setShowStart] = useState(false);
+  const [showEnd, setShowEnd] = useState(false);
   const [age, setAge] = useState('');
-  const [email, setEmail] = useState('');
-  const [currency, setCurrency] = useState('USD');
+  const [optionalEmail, setOptionalEmail] = useState('');
+
+  const validateAndContinue = () => {
+    if (!origin || !destination || !age || !startDate || !endDate) {
+      Alert.alert("Missing Information", "Please complete all fields before continuing.");
+    } else {
+      navigation.navigate('Plans', { optionalEmail });
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Your Trip</Text>
+      <Text style={styles.title}>Trip Info</Text>
 
-      <Picker selectedValue={origin} onValueChange={(v) => setOrigin(v)} style={styles.picker}>
-        <Picker.Item label="Fly from..." value="" />
+      <Text style={styles.label}>From:</Text>
+      <Picker selectedValue={origin} onValueChange={setOrigin} style={styles.picker}>
+        <Picker.Item label="Select country..." value="" />
         <Picker.Item label="Bogotá" value="Bogotá" />
-        <Picker.Item label="Mexico City" value="CDMX" />
+        <Picker.Item label="CDMX" value="CDMX" />
       </Picker>
 
-      <Picker selectedValue={destination} onValueChange={(v) => setDestination(v)} style={styles.picker}>
-        <Picker.Item label="Fly to..." value="" />
+      <Text style={styles.label}>To:</Text>
+      <Picker selectedValue={destination} onValueChange={setDestination} style={styles.picker}>
+        <Picker.Item label="Select destination..." value="" />
         <Picker.Item label="NYC" value="NYC" />
         <Picker.Item label="Madrid" value="Madrid" />
       </Picker>
 
-      <TouchableOpacity onPress={() => setShowStartPicker(true)} style={styles.dateButton}>
-        <Text>Start: {startDate.toDateString()}</Text>
+      <TouchableOpacity onPress={() => setShowStart(true)} style={styles.dateInput}>
+        <Text>Start Date: {startDate.toDateString()}</Text>
       </TouchableOpacity>
-      {showStartPicker && (
-        <DateTimePicker value={startDate} mode="date" onChange={(_, d) => { setShowStartPicker(false); if (d) setStartDate(d); }} />
-      )}
+      {showStart && <DateTimePicker value={startDate} mode="date" onChange={(_, date) => { setShowStart(false); if (date) setStartDate(date); }} />}
 
-      <TouchableOpacity onPress={() => setShowEndPicker(true)} style={styles.dateButton}>
-        <Text>End: {endDate.toDateString()}</Text>
+      <TouchableOpacity onPress={() => setShowEnd(true)} style={styles.dateInput}>
+        <Text>End Date: {endDate.toDateString()}</Text>
       </TouchableOpacity>
-      {showEndPicker && (
-        <DateTimePicker value={endDate} mode="date" onChange={(_, d) => { setShowEndPicker(false); if (d) setEndDate(d); }} />
-      )}
+      {showEnd && <DateTimePicker value={endDate} mode="date" onChange={(_, date) => { setShowEnd(false); if (date) setEndDate(date); }} />}
 
-      <TextInput style={styles.input} placeholder="Your age" value={age} onChangeText={setAge} keyboardType="numeric" />
-      <TextInput style={styles.input} placeholder="Your email" value={email} onChangeText={setEmail} keyboardType="email-address" />
+      <TextInput style={styles.input} placeholder="Your age" value={age} keyboardType="numeric" onChangeText={setAge} />
+      <TextInput style={styles.input} placeholder="Optional email for confirmation" value={optionalEmail} onChangeText={setOptionalEmail} />
 
-      <Picker selectedValue={currency} onValueChange={(v) => setCurrency(v)} style={styles.picker}>
-        <Picker.Item label="USD $" value="USD" />
-        <Picker.Item label="EUR €" value="EUR" />
-      </Picker>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Plans')}>
+      <TouchableOpacity style={styles.button} onPress={validateAndContinue}>
         <Text style={styles.buttonText}>See Plans</Text>
       </TouchableOpacity>
     </ScrollView>
   );
 }
-function PlansScreen({ navigation }) {
+
+function PlansScreen({ route }) {
+  const [compare, setCompare] = useState(false);
+  const { optionalEmail } = route.params;
+
   const plans = [
-    {
-      company: 'AXA',
-      logo: insuranceLogos.AXA,
-      price: 45,
-      coverage: '$200,000',
-      details: ['Trip cancellation', 'COVID-19', 'Luggage loss'],
-    },
-    {
-      company: 'Turismo',
-      logo: insuranceLogos.Turismo,
-      price: 35,
-      coverage: '$150,000',
-      details: ['Trip interruption', 'Medical care'],
-    },
-    {
-      company: 'SecurViajes',
-      logo: insuranceLogos.SecurViajes,
-      price: 52,
-      coverage: '$300,000',
-      details: ['Emergency return', 'Premium support'],
-    },
+    { name: "AXA", price: "$45", coverage: "$200k", benefits: ["COVID-19", "Lost Luggage", "Flight Delay"] },
+    { name: "Turismo Seguro", price: "$39", coverage: "$150k", benefits: ["Trip Cancellation", "Medical", "Basic Baggage"] },
+    { name: "SecurViajes", price: "$52", coverage: "$300k", benefits: ["Full Coverage", "Emergency Return", "VIP Service"] },
   ];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Recommended Plans</Text>
-      {plans.map((p, i) => (
-        <View key={i} style={styles.card}>
-          <Image source={{ uri: p.logo }} style={styles.logoImg} />
-          <Text style={styles.cardTitle}>{p.company}</Text>
-          <Text style={styles.coverage}>Coverage: {p.coverage}</Text>
-          {p.details.map((d, j) => (
-            <Text key={j} style={styles.detail}>• {d}</Text>
+      <TouchableOpacity onPress={() => setCompare(!compare)}>
+        <Text style={styles.link}>{compare ? "Hide Comparison" : "Compare Plans"}</Text>
+      </TouchableOpacity>
+
+      {compare ? (
+        <View style={styles.compareBox}>
+          {plans.map((plan, i) => (
+            <View key={i} style={styles.compareCard}>
+              <Text style={styles.cardTitle}>{plan.name}</Text>
+              <Text>{plan.price}</Text>
+              <Text>{plan.coverage}</Text>
+              {plan.benefits.map((b, j) => (
+                <Text key={j} style={styles.bullet}>• {b}</Text>
+              ))}
+            </View>
           ))}
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Payment')}>
-            <Text style={styles.buttonText}>Select - ${p.price}</Text>
-          </TouchableOpacity>
         </View>
-      ))}
+      ) : (
+        plans.map((plan, i) => (
+          <View key={i} style={styles.card}>
+            <Text style={styles.cardTitle}>{plan.name}</Text>
+            <Text>{plan.price}</Text>
+            <Text>{plan.coverage}</Text>
+            {plan.benefits.map((b, j) => (
+              <Text key={j} style={styles.bullet}>• {b}</Text>
+            ))}
+            <TouchableOpacity style={styles.button}>
+              <Text style={styles.buttonText}>Select</Text>
+            </TouchableOpacity>
+          </View>
+        ))
+      )}
     </ScrollView>
-  );
-}
-
-function PaymentScreen({ navigation }) {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Confirm Payment</Text>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Confirmation')}>
-        <Text style={styles.buttonText}>Pay Now</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
-function ConfirmationScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>You're all set!</Text>
-      <Text style={styles.subtitle}>A confirmation has been sent to your email.</Text>
-      <Text style={{ fontSize: 60, marginTop: 40 }}>✓</Text>
-    </View>
-  );
-}
-
-function ProfileScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Your Account</Text>
-      <Text>Name: Juan Traveler</Text>
-      <Text>Email: juan@example.com</Text>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Log Out</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
-function HelpScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Need Help?</Text>
-      <Text style={styles.subtitle}>Chatbot assistant coming soon...</Text>
-      <Text>Contact: support@briki.com</Text>
-    </View>
   );
 }
 
@@ -197,10 +134,6 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Form" component={FormScreen} />
         <Stack.Screen name="Plans" component={PlansScreen} />
-        <Stack.Screen name="Payment" component={PaymentScreen} />
-        <Stack.Screen name="Confirmation" component={ConfirmationScreen} />
-        <Stack.Screen name="Profile" component={ProfileScreen} />
-        <Stack.Screen name="Help" component={HelpScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -210,25 +143,18 @@ const styles = StyleSheet.create({
   container: {
     padding: 24,
     flexGrow: 1,
-    backgroundColor: '#fff6eb',
+    backgroundColor: '#fffdf6',
     alignItems: 'center',
-    justifyContent: 'flex-start',
   },
   logo: {
-    fontSize: 46,
+    fontSize: 44,
     fontWeight: 'bold',
     color: '#000',
-  },
-  check: {
-    color: '#007AFF',
-    fontSize: 24,
-    position: 'absolute',
-    top: -6,
-    right: -10,
+    marginBottom: 10,
   },
   subtitle: {
-    marginBottom: 20,
-    color: '#333',
+    fontSize: 16,
+    marginBottom: 30,
   },
   title: {
     fontSize: 22,
@@ -237,45 +163,45 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 8,
+    borderColor: '#ccc',
+    borderWidth: 1,
     width: '100%',
+    padding: 12,
     marginBottom: 10,
-    borderColor: '#ddd',
+    borderRadius: 8,
+  },
+  dateInput: {
+    backgroundColor: '#fff',
+    padding: 12,
+    width: '100%',
+    borderRadius: 8,
+    marginBottom: 10,
+    borderColor: '#ccc',
     borderWidth: 1,
   },
   picker: {
+    backgroundColor: '#fff',
     width: '100%',
-    marginBottom: 10,
-    backgroundColor: '#fff',
-  },
-  dateButton: {
-    backgroundColor: '#fff',
-    padding: 14,
     borderRadius: 8,
-    width: '100%',
     marginBottom: 10,
   },
   button: {
     backgroundColor: '#007AFF',
     padding: 14,
     borderRadius: 8,
+    marginTop: 10,
     width: '100%',
     alignItems: 'center',
-    marginTop: 10,
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
   },
-  link: {
+  label: {
+    alignSelf: 'flex-start',
+    marginBottom: 4,
     marginTop: 10,
-    color: '#007AFF',
-  },
-  checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
+    color: '#555',
   },
   card: {
     backgroundColor: '#fff',
@@ -283,28 +209,35 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     width: '100%',
     marginBottom: 20,
-    shadowColor: '#ccc',
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
+    shadowColor: '#ddd',
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
     shadowOffset: { width: 0, height: 2 },
-  },
-  logoImg: {
-    width: 60,
-    height: 30,
-    resizeMode: 'contain',
-    marginBottom: 6,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 4,
+    marginBottom: 6,
     color: '#007AFF',
   },
-  coverage: {
-    color: '#444',
-  },
-  detail: {
-    color: '#666',
+  bullet: {
+    color: '#555',
     fontSize: 14,
+  },
+  compareBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  compareCard: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    margin: 5,
+  },
+  link: {
+    color: '#007AFF',
+    marginBottom: 16,
   },
 });
