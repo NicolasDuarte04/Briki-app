@@ -1,94 +1,99 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 
 export default function App() {
-  const [destination, setDestination] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [age, setAge] = useState('');
-  const [email, setEmail] = useState('');
+  const plans = [
+    {
+      company: 'AXA',
+      price: '$45',
+      coverage: '$200,000',
+      includes: ['Trip cancellation', 'Baggage', 'COVID-19'],
+    },
+    {
+      company: 'Turismo',
+      price: '$38',
+      coverage: '$150,000',
+      includes: ['Trip cancellation', 'Baggage'],
+    },
+    {
+      company: 'Secur',
+      price: '$52',
+      coverage: '$300,000',
+      includes: ['Trip cancellation', 'Baggage', 'Emergency return'],
+    },
+  ];
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.logo}>briki</Text>
-      <Text style={styles.subtitle}>Travel Details</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>Select a Travel Insurance Plan</Text>
 
-      <TextInput
-        placeholder="Enter destination"
-        style={styles.input}
-        value={destination}
-        onChangeText={setDestination}
-      />
-      <TextInput
-        placeholder="Start date (YYYY-MM-DD)"
-        style={styles.input}
-        value={startDate}
-        onChangeText={setStartDate}
-      />
-      <TextInput
-        placeholder="End date (YYYY-MM-DD)"
-        style={styles.input}
-        value={endDate}
-        onChangeText={setEndDate}
-      />
-      <TextInput
-        placeholder="Traveler's age"
-        style={styles.input}
-        keyboardType="numeric"
-        value={age}
-        onChangeText={setAge}
-      />
-      <TextInput
-        placeholder="Email"
-        style={styles.input}
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
-
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Show My Options</Text>
-      </TouchableOpacity>
-    </View>
+      {plans.map((plan, index) => (
+        <View key={index} style={styles.card}>
+          <Text style={styles.company}>{plan.company}</Text>
+          <Text style={styles.price}>{plan.price}</Text>
+          <Text style={styles.coverage}>Coverage: {plan.coverage}</Text>
+          {plan.includes.map((item, i) => (
+            <Text key={i} style={styles.detail}>• {item}</Text>
+          ))}
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Select</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#fff6eb',
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: 20,
+    paddingTop: 60,
   },
-  logo: {
-    fontSize: 40,
+  title: {
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 20,
     marginBottom: 20,
+    alignSelf: 'center',
   },
-  input: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
+  card: {
     backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  company: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 5,
+  },
+  price: {
+    fontSize: 18,
+    color: '#007AFF',
+    marginBottom: 8,
+  },
+  coverage: {
+    fontSize: 16,
+    marginBottom: 6,
+  },
+  detail: {
+    fontSize: 14,
+    color: '#555',
   },
   button: {
+    marginTop: 12,
     backgroundColor: '#007AFF',
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 10,
-    marginTop: 10,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
     fontWeight: '600',
+    fontSize: 16,
   },
 });
