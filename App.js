@@ -7,6 +7,7 @@ import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useWindowDimensions } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -22,16 +23,20 @@ export default function App() {
   );
 }
 function LoginScreen({ navigation }) {
+  const { width } = useWindowDimensions();
+  const inputWidth = Math.min(width * 0.9, 360);
+  const fontSize = width < 375 ? 14 : 16;
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.logo}>briki</Text>
-      <Text style={styles.subtitle}>Login to your account</Text>
+      <Text style={[styles.logo, { fontSize: 42 }]}>briki</Text>
+      <Text style={[styles.subtitle, { fontSize }]}>Login to your account</Text>
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, { width: inputWidth, fontSize }]}
         placeholder="Email"
         placeholderTextColor="#666"
         keyboardType="email-address"
@@ -39,7 +44,7 @@ function LoginScreen({ navigation }) {
         onChangeText={setEmail}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, { width: inputWidth, fontSize }]}
         placeholder="Password"
         placeholderTextColor="#666"
         secureTextEntry
@@ -47,7 +52,7 @@ function LoginScreen({ navigation }) {
         onChangeText={setPassword}
       />
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TripInfo')}>
+      <TouchableOpacity style={[styles.button, { width: inputWidth }]} onPress={() => navigation.navigate('TripInfo')}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
@@ -57,6 +62,10 @@ function LoginScreen({ navigation }) {
   );
 }
 function TripInfoScreen({ navigation }) {
+  const { width } = useWindowDimensions();
+  const inputWidth = Math.min(width * 0.9, 360);
+  const fontSize = width < 375 ? 14 : 16;
+
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [age, setAge] = useState('');
@@ -67,19 +76,19 @@ function TripInfoScreen({ navigation }) {
 
   const handleContinue = () => {
     if (!from || !to || !age || !startDate || !endDate) {
-      Alert.alert("Please complete all fields before continuing.");
-    } else {
-      navigation.navigate('Plans');
+      Alert.alert("Please complete all fields.");
+      return;
     }
+    navigation.navigate('Plans');
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.form}>
-        <Text style={styles.title}>Trip Info</Text>
+        <Text style={[styles.title, { fontSize: 22 }]}>Trip Info</Text>
 
-        <Text style={styles.label}>From:</Text>
-        <View style={styles.pickerContainer}>
+        <Text style={[styles.label, { fontSize }]}>From:</Text>
+        <View style={[styles.pickerContainer, { width: inputWidth }]}>
           <Picker selectedValue={from} onValueChange={setFrom}>
             <Picker.Item label="Select origin..." value="" />
             <Picker.Item label="Bogotá" value="Bogotá" />
@@ -87,8 +96,8 @@ function TripInfoScreen({ navigation }) {
           </Picker>
         </View>
 
-        <Text style={styles.label}>To:</Text>
-        <View style={styles.pickerContainer}>
+        <Text style={[styles.label, { fontSize }]}>To:</Text>
+        <View style={[styles.pickerContainer, { width: inputWidth }]}>
           <Picker selectedValue={to} onValueChange={setTo}>
             <Picker.Item label="Select destination..." value="" />
             <Picker.Item label="New York" value="New York" />
@@ -96,8 +105,8 @@ function TripInfoScreen({ navigation }) {
           </Picker>
         </View>
 
-        <Text style={styles.label}>Start Date:</Text>
-        <TouchableOpacity style={styles.input} onPress={() => setShowStart(true)}>
+        <Text style={[styles.label, { fontSize }]}>Start Date:</Text>
+        <TouchableOpacity onPress={() => setShowStart(true)} style={[styles.input, { width: inputWidth }]}>
           <Text>{startDate.toDateString()}</Text>
         </TouchableOpacity>
         {showStart && (
@@ -106,8 +115,8 @@ function TripInfoScreen({ navigation }) {
           />
         )}
 
-        <Text style={styles.label}>End Date:</Text>
-        <TouchableOpacity style={styles.input} onPress={() => setShowEnd(true)}>
+        <Text style={[styles.label, { fontSize }]}>End Date:</Text>
+        <TouchableOpacity onPress={() => setShowEnd(true)} style={[styles.input, { width: inputWidth }]}>
           <Text>{endDate.toDateString()}</Text>
         </TouchableOpacity>
         {showEnd && (
@@ -117,7 +126,7 @@ function TripInfoScreen({ navigation }) {
         )}
 
         <TextInput
-          style={styles.input}
+          style={[styles.input, { width: inputWidth, fontSize }]}
           placeholder="Your age"
           placeholderTextColor="#666"
           keyboardType="numeric"
@@ -125,7 +134,7 @@ function TripInfoScreen({ navigation }) {
           onChangeText={setAge}
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleContinue}>
+        <TouchableOpacity style={[styles.button, { width: inputWidth }]} onPress={handleContinue}>
           <Text style={styles.buttonText}>See Plans</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -133,6 +142,11 @@ function TripInfoScreen({ navigation }) {
   );
 }
 function PlansScreen({ navigation }) {
+  const { width } = useWindowDimensions();
+  const cardWidth = Math.min(width * 0.9, 360);
+  const compareCardWidth = Math.min(width * 0.42, 170);
+  const fontSize = width < 375 ? 14 : 16;
+
   const [compare, setCompare] = useState(false);
 
   const plans = [
@@ -158,10 +172,10 @@ function PlansScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Recommended Plans</Text>
+      <Text style={[styles.title, { fontSize: 22 }]}>Recommended Plans</Text>
 
       <View style={styles.compareToggle}>
-        <Text style={styles.label}>Compare Plans</Text>
+        <Text style={[styles.label, { fontSize }]}>Compare Plans</Text>
         <Switch value={compare} onValueChange={setCompare} />
       </View>
 
@@ -169,10 +183,10 @@ function PlansScreen({ navigation }) {
         {compare ? (
           <View style={styles.compareContainer}>
             {plans.map((plan, index) => (
-              <View key={index} style={styles.compareCard}>
-                <Text style={styles.planName}>{plan.name}</Text>
-                <Text>{plan.price}</Text>
-                <Text>{plan.coverage}</Text>
+              <View key={index} style={[styles.compareCard, { width: compareCardWidth }]}>
+                <Text style={[styles.planName, { fontSize: fontSize + 1 }]}>{plan.name}</Text>
+                <Text style={{ fontSize }}>{plan.price}</Text>
+                <Text style={{ fontSize }}>{plan.coverage}</Text>
                 {plan.perks.map((perk, idx) => (
                   <Text key={idx} style={styles.bullet}>• {perk}</Text>
                 ))}
@@ -181,14 +195,14 @@ function PlansScreen({ navigation }) {
           </View>
         ) : (
           plans.map((plan, index) => (
-            <View key={index} style={styles.card}>
-              <Text style={styles.planName}>{plan.name}</Text>
+            <View key={index} style={[styles.card, { width: cardWidth }]}>
+              <Text style={[styles.planName, { fontSize: fontSize + 1 }]}>{plan.name}</Text>
               <Text>{plan.price}</Text>
               <Text>{plan.coverage}</Text>
               {plan.perks.map((perk, idx) => (
                 <Text key={idx} style={styles.bullet}>• {perk}</Text>
               ))}
-              <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Checkout')}>
+              <TouchableOpacity style={[styles.button, { width: cardWidth }]} onPress={() => navigation.navigate('Checkout')}>
                 <Text style={styles.buttonText}>Select</Text>
               </TouchableOpacity>
             </View>
@@ -199,12 +213,15 @@ function PlansScreen({ navigation }) {
   );
 }
 function CheckoutScreen() {
+  const { width } = useWindowDimensions();
+  const inputWidth = Math.min(width * 0.9, 360);
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Checkout</Text>
       <Text>Your Stripe integration will be added here.</Text>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={[styles.button, { width: inputWidth }]}>
         <Text style={styles.buttonText}>Confirm & Pay</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -218,24 +235,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   form: {
-    paddingBottom: 30,
     alignItems: 'center',
+    paddingBottom: 40,
   },
   logo: {
-    fontSize: 42,
     fontWeight: 'bold',
-    marginTop: 50,
+    marginTop: 40,
     marginBottom: 20,
     textAlign: 'center',
     color: '#000',
   },
   subtitle: {
-    fontSize: 16,
-    marginBottom: 20,
     color: '#444',
+    marginBottom: 30,
   },
   title: {
-    fontSize: 24,
     fontWeight: '600',
     marginBottom: 20,
     color: '#222',
@@ -245,35 +259,28 @@ const styles = StyleSheet.create({
     marginLeft: '5%',
     marginBottom: 6,
     fontWeight: '500',
-    fontSize: 15,
   },
   input: {
     backgroundColor: '#f0f0f0',
     padding: 12,
     borderRadius: 10,
     marginBottom: 10,
-    width: '90%',
-    maxWidth: 360,
     alignSelf: 'center',
-    fontSize: 16,
     color: '#000',
   },
   pickerContainer: {
     backgroundColor: '#f0f0f0',
     borderRadius: 10,
     marginBottom: 10,
-    width: '90%',
-    maxWidth: 360,
     alignSelf: 'center',
   },
   button: {
     backgroundColor: '#007AFF',
-    padding: 14,
+    paddingVertical: 14,
     borderRadius: 10,
-    marginTop: 10,
     alignItems: 'center',
-    width: '90%',
-    maxWidth: 360,
+    marginTop: 10,
+    alignSelf: 'center',
   },
   buttonText: {
     color: '#fff',
@@ -285,15 +292,13 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 10,
     marginBottom: 20,
-    width: '90%',
-    maxWidth: 360,
     shadowColor: '#ccc',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
+    alignSelf: 'center',
   },
   planName: {
-    fontSize: 18,
     fontWeight: '600',
     color: '#007AFF',
     marginBottom: 5,
@@ -307,7 +312,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
     marginBottom: 10,
   },
   compareContainer: {
@@ -319,7 +323,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 10,
     borderRadius: 8,
-    width: 120,
     alignItems: 'center',
     marginBottom: 12,
     elevation: 2,
