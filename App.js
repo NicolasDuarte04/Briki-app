@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import {
   SafeAreaView, View, Text, TextInput, TouchableOpacity,
-  ScrollView, StyleSheet, Alert, Switch, Platform
+  ScrollView, StyleSheet, Alert, Switch, Platform,
+  Animated
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -232,6 +233,15 @@ function PlansScreen({ navigation }) {
   const cardWidth = Math.min(width * 0.9, 360);
   const compareCardWidth = Math.min(width * 0.42, 170);
   const fontSize = width < 375 ? 14 : 16;
+  const [fadeAnim] = useState(new Animated.Value(0));
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   const [compare, setCompare] = useState(false);
   const [selectedPlans, setSelectedPlans] = useState([]);
@@ -300,7 +310,22 @@ function PlansScreen({ navigation }) {
           plans.map((plan, index) => {
             const isSelected = selectedPlans.includes(plan.name);
             return (
-              <View key={index} style={[styles.card, { width: cardWidth }]}>
+              <Animated.View 
+                key={index} 
+                style={[
+                  styles.card, 
+                  { 
+                    width: cardWidth,
+                    opacity: fadeAnim,
+                    transform: [{
+                      translateY: fadeAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [50, 0]
+                      })
+                    }]
+                  }
+                ]}
+              >
                 <Text style={[styles.planName, { fontSize: fontSize + 1 }]}>{plan.name}</Text>
                 <Text>{plan.price}</Text>
                 <Text>{plan.coverage}</Text>
@@ -318,10 +343,21 @@ function PlansScreen({ navigation }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[styles.button, { width: cardWidth, marginTop: 10 }]}
-                  onPress={() => navigation.navigate('Checkout')}
+                  style={[
+                    styles.button, 
+                    { 
+                      width: cardWidth, 
+                      marginTop: 10,
+                      backgroundColor: '#0066cc',
+                      transform: [{ scale: isSelected ? 1.05 : 1 }]
+                    }
+                  ]}
+                  onPress={() => {
+                    togglePlan(plan.name);
+                    setTimeout(() => navigation.navigate('Checkout'), 300);
+                  }}
                 >
-                  <Text style={styles.buttonText}>Select</Text>
+                  <Text style={styles.buttonText}>{isSelected ? 'Continue →' : 'Select Plan'}</Text>
                 </TouchableOpacity>
               </View>
             );
