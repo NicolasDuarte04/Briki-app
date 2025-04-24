@@ -14,20 +14,12 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-	<Stack.Navigator screenOptions={{ headerShown: false }}>
-  <Stack.Screen name="Login" component={LoginScreen} />
-  <Stack.Screen name="TripInfo" component={TripInfoScreen} />
-  <Stack.Screen name="Plans" component={PlansScreen} />
-  <Stack.Screen name="Checkout" component={CheckoutScreen} />
-  <Stack.Screen name="Confirmation" component={ConfirmationScreen} />  // <-- ADD THIS LINE
-</Stack.Navigator>
-		<Stack.Navigator screenOptions={{ headerShown: false }}>
-  <Stack.Screen name="Login" component={LoginScreen} />
-  <Stack.Screen name="TripInfo" component={TripInfoScreen} />
-  <Stack.Screen name="Plans" component={PlansScreen} />
-  <Stack.Screen name="Checkout" component={CheckoutScreen} />
-  <Stack.Screen name="Confirmation" component={ConfirmationScreen} />  // Add this line
-</Stack.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="TripInfo" component={TripInfoScreen} />
+        <Stack.Screen name="Plans" component={PlansScreen} />
+        <Stack.Screen name="Checkout" component={CheckoutScreen} />
+        <Stack.Screen name="Confirmation" component={ConfirmationScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -62,7 +54,10 @@ function LoginScreen({ navigation }) {
         onChangeText={setPassword}
       />
 
-      <TouchableOpacity style={[styles.button, { width: inputWidth }]} onPress={() => navigation.navigate('TripInfo')}>
+      <TouchableOpacity
+        style={[styles.button, { width: inputWidth }]}
+        onPress={() => navigation.navigate('TripInfo')}
+      >
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
@@ -176,7 +171,10 @@ function TripInfoScreen({ navigation }) {
           onChangeText={setAge}
         />
 
-        <TouchableOpacity style={[styles.button, { width: inputWidth }]} onPress={handleContinue}>
+        <TouchableOpacity
+          style={[styles.button, { width: inputWidth }]}
+          onPress={handleContinue}
+        >
           <Text style={styles.buttonText}>See Plans</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -294,57 +292,23 @@ function CheckoutScreen({ navigation }) {
       <Text style={styles.title}>Checkout</Text>
       <Text>Your Stripe integration will be added here.</Text>
 
-	  <TouchableOpacity
-  style={[styles.button, { width: inputWidth }]}
-  onPress={() => navigation.navigate('Confirmation', {
-    from: 'Bogotá',
-    to: 'New York',
-    startDate: 'May 10, 2025',
-    endDate: 'May 20, 2025',
-    plan: 'AXA',
-    price: '$45'
-  })}
->
-  <Text style={styles.buttonText}>Confirm & Pay</Text>
-</TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.button, { width: inputWidth }]}
+        onPress={() => navigation.navigate('Confirmation', {
+          from: 'Bogotá',
+          to: 'New York',
+          startDate: 'May 10, 2025',
+          endDate: 'May 20, 2025',
+          plan: 'AXA',
+          price: '$45'
+        })}
+      >
+        <Text style={styles.buttonText}>Confirm & Pay</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
-function ConfirmationScreen({ navigation }) {
-  const { width } = useWindowDimensions();
-  const inputWidth = Math.min(width * 0.9, 360);
-  const [loading, setLoading] = useState(true);
 
-  // Simulate processing
-  React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000); // 2 seconds
-    return () => clearTimeout(timer);
-  }, []);
-
-  return (
-    <SafeAreaView style={styles.container}>
-      {loading ? (
-        <>
-          <Text style={[styles.title, { fontSize: 20 }]}>Processing your payment...</Text>
-          <Text style={{ color: '#777', marginTop: 20 }}>Please wait</Text>
-        </>
-      ) : (
-        <>
-          <Text style={[styles.title, { fontSize: 22 }]}>All Set!</Text>
-          <Text style={{ textAlign: 'center', marginBottom: 30, color: '#333', fontSize: 16 }}>
-            Your travel insurance has been successfully confirmed.
-          </Text>
-          <TouchableOpacity
-            style={[styles.button, { width: inputWidth }]}
-            onPress={() => navigation.navigate('Login')}
-          >
-            <Text style={styles.buttonText}>Return to Home</Text>
-          </TouchableOpacity>
-        </>
-      )}
-    </SafeAreaView>
-  );
-}
 function ConfirmationScreen({ navigation, route }) {
   const { width } = useWindowDimensions();
   const inputWidth = Math.min(width * 0.9, 360);
@@ -432,6 +396,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignSelf: 'center',
     color: '#000',
+  },
+  pickerContainer: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    marginBottom: 10,
+    alignSelf: 'center',
   },
   button: {
     backgroundColor: '#007AFF',
