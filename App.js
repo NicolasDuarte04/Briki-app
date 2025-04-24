@@ -16,6 +16,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="TripInfo" component={TripInfoScreen} />
         <Stack.Screen name="Plans" component={PlansScreen} />
         <Stack.Screen name="Checkout" component={CheckoutScreen} />
@@ -56,13 +57,54 @@ function LoginScreen({ navigation }) {
 
       <TouchableOpacity
         style={[styles.button, { width: inputWidth }]}
-        onPress={() => navigation.navigate('TripInfo')}
+        onPress={() => navigation.navigate('Home')}
       >
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
       <TouchableOpacity><Text style={styles.link}>Forgot password?</Text></TouchableOpacity>
       <TouchableOpacity><Text style={styles.link}>Create new account</Text></TouchableOpacity>
+    </SafeAreaView>
+  );
+}
+
+function HomeScreen({ navigation }) {
+  const { width } = useWindowDimensions();
+  const buttonWidth = Math.min(width * 0.9, 360);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.form}>
+        <Text style={[styles.logo, { fontSize: 36, marginBottom: 10 }]}>briki</Text>
+        <Text style={{ fontSize: 18, fontWeight: '600', marginBottom: 30, color: '#333' }}>
+          Welcome back!
+        </Text>
+
+        <TouchableOpacity
+          style={[styles.button, { width: buttonWidth }]}
+          onPress={() => navigation.navigate('TripInfo')}
+        >
+          <Text style={styles.buttonText}>Start New Trip</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, { width: buttonWidth }]}
+          onPress={() => alert('Feature coming soon!')}
+        >
+          <Text style={styles.buttonText}>View Past Trips</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, { width: buttonWidth }]}
+          onPress={() => alert('Support chat coming soon!')}
+        >
+          <Text style={styles.buttonText}>Support</Text>
+        </TouchableOpacity>
+
+        <Text style={{ marginTop: 40, fontSize: 14, color: '#999' }}>
+          Powered by Briki • v1.0
+        </Text>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -86,6 +128,8 @@ function TripInfoScreen({ navigation }) {
     }
     navigation.navigate('Plans');
   };
+
+  const formComplete = from && to && age && startDate && endDate;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -143,27 +187,25 @@ function TripInfoScreen({ navigation }) {
         <Text style={[styles.label, { fontSize }]}>End Date:</Text>
         <TouchableOpacity
           onPress={() => setShowEnd(true)}
-          style={[styles.input, { width: inputWidth, marginBottom: 20 }]}
+          style={[styles.input, { width: inputWidth }]}
         >
           <Text>{endDate.toDateString()}</Text>
         </TouchableOpacity>
         {showEnd && (
-          <View style={{ marginBottom: 20 }}>
-            <DateTimePicker
-              value={endDate}
-              mode="date"
-              display="default"
-              onChange={(event, selectedDate) => {
-                setShowEnd(false);
-                if (selectedDate) setEndDate(selectedDate);
-              }}
-              style={{ backgroundColor: 'white' }}
-            />
-          </View>
+          <DateTimePicker
+            value={endDate}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowEnd(false);
+              if (selectedDate) setEndDate(selectedDate);
+            }}
+            style={{ backgroundColor: 'white' }}
+          />
         )}
 
         <TextInput
-          style={[styles.input, { width: inputWidth, fontSize, marginTop: 10 }]}
+          style={[styles.input, { width: inputWidth, fontSize }]}
           placeholder="Your age"
           placeholderTextColor="#666"
           keyboardType="numeric"
@@ -172,8 +214,12 @@ function TripInfoScreen({ navigation }) {
         />
 
         <TouchableOpacity
-          style={[styles.button, { width: inputWidth }]}
+          style={[
+            styles.button,
+            { width: inputWidth, backgroundColor: formComplete ? '#007AFF' : '#ccc' }
+          ]}
           onPress={handleContinue}
+          disabled={!formComplete}
         >
           <Text style={styles.buttonText}>See Plans</Text>
         </TouchableOpacity>
@@ -221,14 +267,14 @@ function PlansScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={[styles.title, { fontSize: 22 }]}>Recommended Plans</Text>
-
-      <View style={styles.compareToggle}>
-        <Text style={[styles.label, { fontSize }]}>Compare Plans</Text>
-        <Switch value={compare} onValueChange={setCompare} />
-      </View>
-
       <ScrollView contentContainerStyle={styles.form}>
+        <Text style={[styles.title, { fontSize: 22 }]}>Recommended Plans</Text>
+
+        <View style={styles.compareToggle}>
+          <Text style={[styles.label, { fontSize }]}>Compare Plans</Text>
+          <Switch value={compare} onValueChange={setCompare} />
+        </View>
+
         {compare ? (
           selectedPlans.length >= 2 ? (
             <View style={styles.compareContainer}>
@@ -237,8 +283,8 @@ function PlansScreen({ navigation }) {
                 .map((plan, index) => (
                   <View key={index} style={[styles.compareCard, { width: compareCardWidth }]}>
                     <Text style={[styles.planName, { fontSize: fontSize + 1 }]}>{plan.name}</Text>
-                    <Text style={{ fontSize }}>{plan.price}</Text>
-                    <Text style={{ fontSize }}>{plan.coverage}</Text>
+                    <Text>{plan.price}</Text>
+                    <Text>{plan.coverage}</Text>
                     {plan.perks.map((perk, idx) => (
                       <Text key={idx} style={styles.bullet}>• {perk}</Text>
                     ))}
@@ -247,7 +293,7 @@ function PlansScreen({ navigation }) {
             </View>
           ) : (
             <Text style={{ color: '#999', textAlign: 'center', marginTop: 20 }}>
-              Please select 2 or more plans to compare.
+              Please select at least two plans to compare.
             </Text>
           )
         ) : (
@@ -261,6 +307,7 @@ function PlansScreen({ navigation }) {
                 {plan.perks.map((perk, idx) => (
                   <Text key={idx} style={styles.bullet}>• {perk}</Text>
                 ))}
+
                 <TouchableOpacity
                   style={{ marginTop: 10 }}
                   onPress={() => togglePlan(plan.name)}
@@ -269,6 +316,7 @@ function PlansScreen({ navigation }) {
                     {isSelected ? '✓ Selected for Comparison' : 'Select to Compare'}
                   </Text>
                 </TouchableOpacity>
+
                 <TouchableOpacity
                   style={[styles.button, { width: cardWidth, marginTop: 10 }]}
                   onPress={() => navigation.navigate('Checkout')}
@@ -335,19 +383,19 @@ function ConfirmationScreen({ navigation, route }) {
             Your travel insurance has been confirmed.
           </Text>
 
-          <View style={[styles.card, { width: inputWidth, backgroundColor: '#f8f8f8' }]}>
-            <Text style={{ fontWeight: '600', fontSize: 16 }}>Trip Summary</Text>
-            <Text>From: {from}</Text>
-            <Text>To: {to}</Text>
-            <Text>Start: {startDate}</Text>
-            <Text>End: {endDate}</Text>
-            <Text>Plan: {plan}</Text>
-            <Text>Total: {price}</Text>
+          <View style={[styles.card, { width: inputWidth, backgroundColor: '#f8f8f8', padding: 18 }]}>
+            <Text style={{ fontWeight: '600', fontSize: 16, marginBottom: 10 }}>Trip Summary</Text>
+            <Text style={styles.bullet}>From: {from}</Text>
+            <Text style={styles.bullet}>To: {to}</Text>
+            <Text style={styles.bullet}>Start: {startDate}</Text>
+            <Text style={styles.bullet}>End: {endDate}</Text>
+            <Text style={styles.bullet}>Plan: {plan}</Text>
+            <Text style={styles.bullet}>Total: {price}</Text>
           </View>
 
           <TouchableOpacity
             style={[styles.button, { width: inputWidth, marginTop: 30 }]}
-            onPress={() => navigation.navigate('Login')}
+            onPress={() => navigation.navigate('Home')}
           >
             <Text style={styles.buttonText}>Return to Home</Text>
           </TouchableOpacity>
@@ -366,34 +414,38 @@ const styles = StyleSheet.create({
   form: {
     alignItems: 'center',
     paddingBottom: 40,
+    paddingHorizontal: 20,
+    width: '100%',
   },
   logo: {
     fontWeight: 'bold',
     marginTop: 40,
-    marginBottom: 20,
+    marginBottom: 10,
     textAlign: 'center',
     color: '#000',
   },
   subtitle: {
     color: '#444',
     marginBottom: 30,
+    fontWeight: '500',
   },
   title: {
     fontWeight: '700',
     marginBottom: 20,
     color: '#222',
+    textAlign: 'center',
   },
   label: {
     alignSelf: 'flex-start',
-    marginLeft: '5%',
     marginBottom: 6,
     fontWeight: '600',
+    color: '#333',
   },
   input: {
     backgroundColor: '#f0f0f0',
     padding: 12,
     borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: 12,
     alignSelf: 'center',
     color: '#000',
   },
@@ -442,7 +494,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 10,
+    marginVertical: 10,
+    gap: 10,
   },
   compareContainer: {
     flexDirection: 'row',
@@ -460,5 +513,6 @@ const styles = StyleSheet.create({
   link: {
     marginTop: 10,
     color: '#007AFF',
+    fontWeight: '500',
   },
 });
