@@ -89,74 +89,71 @@ function TripInfoScreen({ navigation }) {
         <Text style={[styles.title, { fontSize: 22 }]}>Trip Info</Text>
 
         <Text style={[styles.label, { fontSize }]}>From:</Text>
-        <View style={[styles.pickerContainerFixed, { width: inputWidth, zIndex: 10 }]}>
-          <Picker
-            selectedValue={from}
-            onValueChange={setFrom}
-            dropdownIconColor="#000"
-            style={{ color: from ? '#000' : '#888' }}
-          >
-            <Picker.Item label="Select origin..." value="" color="#888" />
-            <Picker.Item label="Bogotá" value="Bogotá" />
-            <Picker.Item label="CDMX" value="CDMX" />
-          </Picker>
-        </View>
-
-        <Text style={[styles.label, { fontSize }]}>To:</Text>
-        <View style={[styles.pickerContainerFixed, { width: inputWidth, zIndex: 9 }]}>
-          <Picker
-            selectedValue={to}
-            onValueChange={setTo}
-            dropdownIconColor="#000"
-            style={{ color: to ? '#000' : '#888' }}
-          >
-            <Picker.Item label="Select destination..." value="" color="#888" />
-            <Picker.Item label="New York" value="New York" />
-            <Picker.Item label="Madrid" value="Madrid" />
-          </Picker>
-        </View>
-		        <Text style={[styles.label, { fontSize }]}>Start Date:</Text>
         <TouchableOpacity
           style={[styles.input, { width: inputWidth }]}
-          onPress={() => setShowStart(true)}
+          onPress={() =>
+            Alert.alert("Choose Origin", null, [
+              { text: "Bogotá", onPress: () => setFrom("Bogotá") },
+              { text: "CDMX", onPress: () => setFrom("CDMX") },
+              { text: "Cancel", style: "cancel" },
+            ])
+          }
         >
-          <Text style={{ color: '#000' }}>{startDate.toDateString()}</Text>
+          <Text>{from || 'Select origin...'}</Text>
+        </TouchableOpacity>
+
+        <Text style={[styles.label, { fontSize }]}>To:</Text>
+        <TouchableOpacity
+          style={[styles.input, { width: inputWidth }]}
+          onPress={() =>
+            Alert.alert("Choose Destination", null, [
+              { text: "New York", onPress: () => setTo("New York") },
+              { text: "Madrid", onPress: () => setTo("Madrid") },
+              { text: "Cancel", style: "cancel" },
+            ])
+          }
+        >
+          <Text>{to || 'Select destination...'}</Text>
+        </TouchableOpacity>
+
+        <Text style={[styles.label, { fontSize }]}>Start Date:</Text>
+        <TouchableOpacity onPress={() => setShowStart(true)} style={[styles.input, { width: inputWidth }]}>
+          <Text>{startDate.toDateString()}</Text>
         </TouchableOpacity>
         {showStart && (
           <DateTimePicker
             value={startDate}
             mode="date"
             display="default"
-            onChange={(e, selected) => {
+            onChange={(event, selectedDate) => {
               setShowStart(false);
-              if (selected) setStartDate(selected);
+              if (selectedDate) setStartDate(selectedDate);
             }}
+            style={{ backgroundColor: 'white' }}
           />
         )}
 
         <Text style={[styles.label, { fontSize }]}>End Date:</Text>
-        <TouchableOpacity
-          style={[styles.input, { width: inputWidth }]}
-          onPress={() => setShowEnd(true)}
-        >
-          <Text style={{ color: '#000' }}>{endDate.toDateString()}</Text>
+        <TouchableOpacity onPress={() => setShowEnd(true)} style={[styles.input, { width: inputWidth }]}>
+          <Text>{endDate.toDateString()}</Text>
         </TouchableOpacity>
         {showEnd && (
           <DateTimePicker
             value={endDate}
             mode="date"
             display="default"
-            onChange={(e, selected) => {
+            onChange={(event, selectedDate) => {
               setShowEnd(false);
-              if (selected) setEndDate(selected);
+              if (selectedDate) setEndDate(selectedDate);
             }}
+            style={{ backgroundColor: 'white' }}
           />
         )}
 
         <TextInput
           style={[styles.input, { width: inputWidth, fontSize }]}
           placeholder="Your age"
-          placeholderTextColor="#888"
+          placeholderTextColor="#666"
           keyboardType="numeric"
           value={age}
           onChangeText={setAge}
