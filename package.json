@@ -1,3 +1,4 @@
+
 {
   "name": "briki-app",
   "version": "1.0.0",
@@ -19,6 +20,7 @@
     "react-native-screens": "~3.20.0",
     "react-native-safe-area-context": "4.5.0",
     "@react-native-picker/picker": "^2.4.10",
-    "@react-native-community/datetimepicker": "6.7.3"
+    "@react-native-community/datetimepicker": "6.7.3",
+    "@expo/webpack-config": "^18.0.1"
   }
 }
