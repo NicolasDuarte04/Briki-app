@@ -14,11 +14,20 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="TripInfo" component={TripInfoScreen} />
-        <Stack.Screen name="Plans" component={PlansScreen} />
-        <Stack.Screen name="Checkout" component={CheckoutScreen} />
+	<Stack.Navigator screenOptions={{ headerShown: false }}>
+  <Stack.Screen name="Login" component={LoginScreen} />
+  <Stack.Screen name="TripInfo" component={TripInfoScreen} />
+  <Stack.Screen name="Plans" component={PlansScreen} />
+  <Stack.Screen name="Checkout" component={CheckoutScreen} />
+  <Stack.Screen name="Confirmation" component={ConfirmationScreen} />  // <-- ADD THIS LINE
+</Stack.Navigator>
+		<Stack.Navigator screenOptions={{ headerShown: false }}>
+  <Stack.Screen name="Login" component={LoginScreen} />
+  <Stack.Screen name="TripInfo" component={TripInfoScreen} />
+  <Stack.Screen name="Plans" component={PlansScreen} />
+  <Stack.Screen name="Checkout" component={CheckoutScreen} />
+  <Stack.Screen name="Confirmation" component={ConfirmationScreen} />  // Add this line
+</Stack.Navigator>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -276,7 +285,7 @@ function PlansScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-function CheckoutScreen() {
+function CheckoutScreen({ navigation }) {
   const { width } = useWindowDimensions();
   const inputWidth = Math.min(width * 0.9, 360);
 
@@ -285,13 +294,104 @@ function CheckoutScreen() {
       <Text style={styles.title}>Checkout</Text>
       <Text>Your Stripe integration will be added here.</Text>
 
-      <TouchableOpacity style={[styles.button, { width: inputWidth }]}>
-        <Text style={styles.buttonText}>Confirm & Pay</Text>
-      </TouchableOpacity>
+	  <TouchableOpacity
+  style={[styles.button, { width: inputWidth }]}
+  onPress={() => navigation.navigate('Confirmation', {
+    from: 'Bogotá',
+    to: 'New York',
+    startDate: 'May 10, 2025',
+    endDate: 'May 20, 2025',
+    plan: 'AXA',
+    price: '$45'
+  })}
+>
+  <Text style={styles.buttonText}>Confirm & Pay</Text>
+</TouchableOpacity>
     </SafeAreaView>
   );
 }
+function ConfirmationScreen({ navigation }) {
+  const { width } = useWindowDimensions();
+  const inputWidth = Math.min(width * 0.9, 360);
+  const [loading, setLoading] = useState(true);
 
+  // Simulate processing
+  React.useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000); // 2 seconds
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {loading ? (
+        <>
+          <Text style={[styles.title, { fontSize: 20 }]}>Processing your payment...</Text>
+          <Text style={{ color: '#777', marginTop: 20 }}>Please wait</Text>
+        </>
+      ) : (
+        <>
+          <Text style={[styles.title, { fontSize: 22 }]}>All Set!</Text>
+          <Text style={{ textAlign: 'center', marginBottom: 30, color: '#333', fontSize: 16 }}>
+            Your travel insurance has been successfully confirmed.
+          </Text>
+          <TouchableOpacity
+            style={[styles.button, { width: inputWidth }]}
+            onPress={() => navigation.navigate('Login')}
+          >
+            <Text style={styles.buttonText}>Return to Home</Text>
+          </TouchableOpacity>
+        </>
+      )}
+    </SafeAreaView>
+  );
+}
+function ConfirmationScreen({ navigation, route }) {
+  const { width } = useWindowDimensions();
+  const inputWidth = Math.min(width * 0.9, 360);
+  const [loading, setLoading] = useState(true);
+
+  const { from, to, startDate, endDate, plan, price } = route.params || {};
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {loading ? (
+        <>
+          <Text style={[styles.title, { fontSize: 20 }]}>Processing your payment...</Text>
+          <Text style={{ color: '#777', marginTop: 20 }}>Please wait</Text>
+        </>
+      ) : (
+        <>
+          <Text style={[styles.title, { fontSize: 22 }]}>All Set!</Text>
+          <Text style={{ textAlign: 'center', marginBottom: 20, color: '#333', fontSize: 16 }}>
+            Your travel insurance has been confirmed.
+          </Text>
+
+          <View style={[styles.card, { width: inputWidth, backgroundColor: '#f8f8f8' }]}>
+            <Text style={{ fontWeight: '600', fontSize: 16 }}>Trip Summary</Text>
+            <Text>From: {from}</Text>
+            <Text>To: {to}</Text>
+            <Text>Start: {startDate}</Text>
+            <Text>End: {endDate}</Text>
+            <Text>Plan: {plan}</Text>
+            <Text>Total: {price}</Text>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.button, { width: inputWidth, marginTop: 30 }]}
+            onPress={() => navigation.navigate('Login')}
+          >
+            <Text style={styles.buttonText}>Return to Home</Text>
+          </TouchableOpacity>
+        </>
+      )}
+    </SafeAreaView>
+  );
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
