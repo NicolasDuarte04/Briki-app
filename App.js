@@ -101,7 +101,8 @@ function TripInfoScreen({ navigation }) {
         >
           <Text>{from || 'Select origin...'}</Text>
         </TouchableOpacity>
-	        <Text style={[styles.label, { fontSize }]}>To:</Text>
+
+        <Text style={[styles.label, { fontSize }]}>To:</Text>
         <TouchableOpacity
           style={[styles.input, { width: inputWidth }]}
           onPress={() =>
@@ -134,7 +135,8 @@ function TripInfoScreen({ navigation }) {
             style={{ backgroundColor: 'white' }}
           />
         )}
-	        <Text style={[styles.label, { fontSize }]}>End Date:</Text>
+
+        <Text style={[styles.label, { fontSize }]}>End Date:</Text>
         <TouchableOpacity
           onPress={() => setShowEnd(true)}
           style={[styles.input, { width: inputWidth, marginBottom: 20 }]}
@@ -171,7 +173,6 @@ function TripInfoScreen({ navigation }) {
       </ScrollView>
     </SafeAreaView>
   );
-}	
 }
 function PlansScreen({ navigation }) {
   const { width } = useWindowDimensions();
@@ -221,7 +222,7 @@ function PlansScreen({ navigation }) {
       </View>
 
       <ScrollView contentContainerStyle={styles.form}>
-	          {compare ? (
+        {compare ? (
           selectedPlans.length >= 2 ? (
             <View style={styles.compareContainer}>
               {plans
@@ -290,6 +291,7 @@ function CheckoutScreen() {
     </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -312,8 +314,8 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 30,
   },
-    title: {
-    fontWeight: '700',  // was 600
+  title: {
+    fontWeight: '700',
     marginBottom: 20,
     color: '#222',
   },
@@ -321,7 +323,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginLeft: '5%',
     marginBottom: 6,
-    fontWeight: '600', // was 500
+    fontWeight: '600',
   },
   input: {
     backgroundColor: '#f0f0f0',
@@ -331,15 +333,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     color: '#000',
   },
-  pickerContainerFixed: {
-    backgroundColor: '#f0f0f0',
-    borderRadius: 10,
-    marginBottom: 10,
-    alignSelf: 'center',
-    height: 48,
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
   button: {
     backgroundColor: '#007AFF',
     paddingVertical: 14,
@@ -348,9 +341,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignSelf: 'center',
   },
-    buttonText: {
+  buttonText: {
     color: '#fff',
-    fontWeight: '700', // was 600
+    fontWeight: '700',
     fontSize: 16,
   },
   card: {
@@ -364,15 +357,15 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     alignSelf: 'center',
   },
-    planName: {
-    fontWeight: '700', // was 600
+  planName: {
+    fontWeight: '700',
     color: '#007AFF',
     marginBottom: 5,
   },
-    bullet: {
+  bullet: {
     color: '#444',
     fontSize: 14,
-    fontWeight: '500', // NEW line
+    fontWeight: '500',
     marginBottom: 2,
   },
   compareToggle: {
