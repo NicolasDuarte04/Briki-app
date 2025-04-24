@@ -101,8 +101,7 @@ function TripInfoScreen({ navigation }) {
         >
           <Text>{from || 'Select origin...'}</Text>
         </TouchableOpacity>
-
-        <Text style={[styles.label, { fontSize }]}>To:</Text>
+	        <Text style={[styles.label, { fontSize }]}>To:</Text>
         <TouchableOpacity
           style={[styles.input, { width: inputWidth }]}
           onPress={() =>
@@ -117,7 +116,10 @@ function TripInfoScreen({ navigation }) {
         </TouchableOpacity>
 
         <Text style={[styles.label, { fontSize }]}>Start Date:</Text>
-        <TouchableOpacity onPress={() => setShowStart(true)} style={[styles.input, { width: inputWidth }]}>
+        <TouchableOpacity
+          onPress={() => setShowStart(true)}
+          style={[styles.input, { width: inputWidth }]}
+        >
           <Text>{startDate.toDateString()}</Text>
         </TouchableOpacity>
         {showStart && (
@@ -132,26 +134,30 @@ function TripInfoScreen({ navigation }) {
             style={{ backgroundColor: 'white' }}
           />
         )}
-
-        <Text style={[styles.label, { fontSize }]}>End Date:</Text>
-        <TouchableOpacity onPress={() => setShowEnd(true)} style={[styles.input, { width: inputWidth }]}>
+	        <Text style={[styles.label, { fontSize }]}>End Date:</Text>
+        <TouchableOpacity
+          onPress={() => setShowEnd(true)}
+          style={[styles.input, { width: inputWidth, marginBottom: 20 }]}
+        >
           <Text>{endDate.toDateString()}</Text>
         </TouchableOpacity>
         {showEnd && (
-          <DateTimePicker
-            value={endDate}
-            mode="date"
-            display="default"
-            onChange={(event, selectedDate) => {
-              setShowEnd(false);
-              if (selectedDate) setEndDate(selectedDate);
-            }}
-            style={{ backgroundColor: 'white' }}
-          />
+          <View style={{ marginBottom: 20 }}>
+            <DateTimePicker
+              value={endDate}
+              mode="date"
+              display="default"
+              onChange={(event, selectedDate) => {
+                setShowEnd(false);
+                if (selectedDate) setEndDate(selectedDate);
+              }}
+              style={{ backgroundColor: 'white' }}
+            />
+          </View>
         )}
 
         <TextInput
-          style={[styles.input, { width: inputWidth, fontSize }]}
+          style={[styles.input, { width: inputWidth, fontSize, marginTop: 10 }]}
           placeholder="Your age"
           placeholderTextColor="#666"
           keyboardType="numeric"
@@ -165,6 +171,7 @@ function TripInfoScreen({ navigation }) {
       </ScrollView>
     </SafeAreaView>
   );
+}	
 }
 function PlansScreen({ navigation }) {
   const { width } = useWindowDimensions();
@@ -173,6 +180,15 @@ function PlansScreen({ navigation }) {
   const fontSize = width < 375 ? 14 : 16;
 
   const [compare, setCompare] = useState(false);
+  const [selectedPlans, setSelectedPlans] = useState([]);
+
+  const togglePlan = (name) => {
+    if (selectedPlans.includes(name)) {
+      setSelectedPlans(selectedPlans.filter(p => p !== name));
+    } else {
+      setSelectedPlans([...selectedPlans, name]);
+    }
+  };
 
   const plans = [
     {
@@ -205,33 +221,55 @@ function PlansScreen({ navigation }) {
       </View>
 
       <ScrollView contentContainerStyle={styles.form}>
-        {compare ? (
-          <View style={styles.compareContainer}>
-            {plans.map((plan, index) => (
-              <View key={index} style={[styles.compareCard, { width: compareCardWidth }]}>
+	          {compare ? (
+          selectedPlans.length >= 2 ? (
+            <View style={styles.compareContainer}>
+              {plans
+                .filter(plan => selectedPlans.includes(plan.name))
+                .map((plan, index) => (
+                  <View key={index} style={[styles.compareCard, { width: compareCardWidth }]}>
+                    <Text style={[styles.planName, { fontSize: fontSize + 1 }]}>{plan.name}</Text>
+                    <Text style={{ fontSize }}>{plan.price}</Text>
+                    <Text style={{ fontSize }}>{plan.coverage}</Text>
+                    {plan.perks.map((perk, idx) => (
+                      <Text key={idx} style={styles.bullet}>• {perk}</Text>
+                    ))}
+                  </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={{ color: '#999', textAlign: 'center', marginTop: 20 }}>
+              Please select 2 or more plans to compare.
+            </Text>
+          )
+        ) : (
+          plans.map((plan, index) => {
+            const isSelected = selectedPlans.includes(plan.name);
+            return (
+              <View key={index} style={[styles.card, { width: cardWidth }]}>
                 <Text style={[styles.planName, { fontSize: fontSize + 1 }]}>{plan.name}</Text>
-                <Text style={{ fontSize }}>{plan.price}</Text>
-                <Text style={{ fontSize }}>{plan.coverage}</Text>
+                <Text>{plan.price}</Text>
+                <Text>{plan.coverage}</Text>
                 {plan.perks.map((perk, idx) => (
                   <Text key={idx} style={styles.bullet}>• {perk}</Text>
                 ))}
+                <TouchableOpacity
+                  style={{ marginTop: 10 }}
+                  onPress={() => togglePlan(plan.name)}
+                >
+                  <Text style={{ color: isSelected ? '#007AFF' : '#999' }}>
+                    {isSelected ? '✓ Selected for Comparison' : 'Select to Compare'}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, { width: cardWidth, marginTop: 10 }]}
+                  onPress={() => navigation.navigate('Checkout')}
+                >
+                  <Text style={styles.buttonText}>Select</Text>
+                </TouchableOpacity>
               </View>
-            ))}
-          </View>
-        ) : (
-          plans.map((plan, index) => (
-            <View key={index} style={[styles.card, { width: cardWidth }]}>
-              <Text style={[styles.planName, { fontSize: fontSize + 1 }]}>{plan.name}</Text>
-              <Text>{plan.price}</Text>
-              <Text>{plan.coverage}</Text>
-              {plan.perks.map((perk, idx) => (
-                <Text key={idx} style={styles.bullet}>• {perk}</Text>
-              ))}
-              <TouchableOpacity style={[styles.button, { width: cardWidth }]} onPress={() => navigation.navigate('Checkout')}>
-                <Text style={styles.buttonText}>Select</Text>
-              </TouchableOpacity>
-            </View>
-          ))
+            );
+          })
         )}
       </ScrollView>
     </SafeAreaView>
@@ -274,8 +312,8 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 30,
   },
-  title: {
-    fontWeight: '600',
+    title: {
+    fontWeight: '700',  // was 600
     marginBottom: 20,
     color: '#222',
   },
@@ -283,7 +321,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginLeft: '5%',
     marginBottom: 6,
-    fontWeight: '500',
+    fontWeight: '600', // was 500
   },
   input: {
     backgroundColor: '#f0f0f0',
@@ -310,9 +348,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignSelf: 'center',
   },
-  buttonText: {
+    buttonText: {
     color: '#fff',
-    fontWeight: '600',
+    fontWeight: '700', // was 600
     fontSize: 16,
   },
   card: {
@@ -326,14 +364,15 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     alignSelf: 'center',
   },
-  planName: {
-    fontWeight: '600',
+    planName: {
+    fontWeight: '700', // was 600
     color: '#007AFF',
     marginBottom: 5,
   },
-  bullet: {
+    bullet: {
     color: '#444',
     fontSize: 14,
+    fontWeight: '500', // NEW line
     marginBottom: 2,
   },
   compareToggle: {
