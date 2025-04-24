@@ -89,7 +89,7 @@ function TripInfoScreen({ navigation }) {
         <Text style={[styles.title, { fontSize: 22 }]}>Trip Info</Text>
 
         <Text style={[styles.label, { fontSize }]}>From:</Text>
-        <View style={[styles.pickerContainerFixed, { width: inputWidth }]}>
+        <View style={[styles.pickerContainerFixed, { width: inputWidth, zIndex: 10 }]}>
           <Picker
             selectedValue={from}
             onValueChange={setFrom}
@@ -103,7 +103,7 @@ function TripInfoScreen({ navigation }) {
         </View>
 
         <Text style={[styles.label, { fontSize }]}>To:</Text>
-        <View style={[styles.pickerContainerFixed, { width: inputWidth }]}>
+        <View style={[styles.pickerContainerFixed, { width: inputWidth, zIndex: 9 }]}>
           <Picker
             selectedValue={to}
             onValueChange={setTo}
@@ -126,7 +126,7 @@ function TripInfoScreen({ navigation }) {
           <DateTimePicker
             value={startDate}
             mode="date"
-            display={Platform.OS === 'ios' ? 'inline' : 'default'}
+            display="default"
             onChange={(e, selected) => {
               setShowStart(false);
               if (selected) setStartDate(selected);
@@ -145,7 +145,7 @@ function TripInfoScreen({ navigation }) {
           <DateTimePicker
             value={endDate}
             mode="date"
-            display={Platform.OS === 'ios' ? 'inline' : 'default'}
+            display="default"
             onChange={(e, selected) => {
               setShowEnd(false);
               if (selected) setEndDate(selected);
