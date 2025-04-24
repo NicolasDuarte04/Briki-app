@@ -1,0 +1,24 @@
+{
+  "name": "briki-app",
+  "version": "1.0.0",
+  "main": "App.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "expo": "~48.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-native": "0.71.8",
+    "react-native-web": "~0.18.10",
+    "@react-navigation/native": "^6.0.13",
+    "@react-navigation/native-stack": "^6.9.1",
+    "react-native-screens": "~3.20.0",
+    "react-native-safe-area-context": "4.5.0",
+    "@react-native-picker/picker": "^2.4.10",
+    "@react-native-community/datetimepicker": "6.7.3"
+  }
+}
